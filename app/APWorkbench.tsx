@@ -1376,14 +1376,13 @@ export default function APWorkbench() {
                   )}
                   {assistantLoading && <div className="assistantThinking"><span className="loader" />Reviewing the current bill facts…</div>}
 
-                  <p className="assistantLead">Ask the agent about {selected?.vendor || "this bill"}</p>
-                  <div className="assistantPrompts" aria-label="Suggested questions">
-                    <button type="button" disabled={assistantLoading} onClick={() => askAssistant("Why was this bill flagged?", "Question")}>Why was this flagged?</button>
-                    <button type="button" disabled={assistantLoading} onClick={() => askAssistant("What evidence would clear this exception?", "Question")}>What evidence would clear it?</button>
-                    <button type="button" disabled={assistantLoading} onClick={() => askAssistant("Draft a request for the submitter.", "Question")}>Draft a request</button>
-                  </div>
-
                   <form className="assistantComposer" onSubmit={(event) => { event.preventDefault(); askAssistant(assistantQuestion); }}>
+                    <p className="assistantLead">Ask the agent about {selected?.vendor || "this bill"}</p>
+                    <div className="assistantPrompts" aria-label="Suggested questions">
+                      <button type="button" disabled={assistantLoading} onClick={() => askAssistant("Why was this bill flagged?", "Question")}>Why was this flagged?</button>
+                      <button type="button" disabled={assistantLoading} onClick={() => askAssistant("What evidence would clear this exception?", "Question")}>What evidence would clear it?</button>
+                      <button type="button" disabled={assistantLoading} onClick={() => askAssistant("Draft a request for the submitter.", "Question")}>Draft a request</button>
+                    </div>
                     <label className="visuallyHidden" htmlFor="assistant-question">Ask a question or add context</label>
                     <textarea
                       id="assistant-question"

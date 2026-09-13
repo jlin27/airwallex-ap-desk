@@ -522,9 +522,14 @@ button.flowStep:hover:not(:disabled) strong { color: var(--ink); }
 /* Agent panel: the explanation and the chat are one surface, not two sections */
 .visuallyHidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .decisionCategory { text-transform: capitalize; }
-.assistantSection { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
-.assistantLead { margin: 0 0 9px; color: #4d5751; font-size: 11px; font-weight: 700; }
-.assistantComposer textarea { min-height: 54px; }
+/* The composer owns the whole ask affordance: scope line, shortcuts, then the field. */
+.assistantSection { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+.assistantComposer { margin-top: 22px; padding: 13px; border: 1px solid var(--line-strong); border-radius: 8px; background: white; }
+.assistantSection > .assistantComposer:first-child { margin-top: 0; }
+.assistantLead { margin: 0 0 10px; color: #4d5751; font-size: 11px; font-weight: 700; }
+.assistantPrompts { margin: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.assistantComposer textarea { min-height: 58px; margin-top: 0; background: #fbfcfb; }
+.assistantComposer textarea:focus { background: white; }
 .agentPanel { position: relative; display: flex; flex-direction: column; }
 .agentPanel .agentResult { flex: 1 1 auto; }
 .payoutAction { position: sticky; bottom: 0; margin-top: auto; padding: 14px 0 18px; background: linear-gradient(to bottom, rgba(249, 250, 249, 0), #f9faf9 22%); border-top: 1px solid var(--line); }
