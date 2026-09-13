@@ -737,7 +737,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         action: "EXTRACTED",
         draft,
-        sourceMessage: message ? { id: message.id, subject: message.subject, attachment: message.attachment } : null,
+        sourceMessage: message
+          ? { id: message.id, subject: message.subject, attachment: message.attachment, fromName: message.fromName, body: message.body }
+          : { id: null, subject: null, attachment: null, fromName: null, body: documentText },
         knownVendors: context.vendors.map((vendor) => vendor.name),
         message: draft.readyToCreate
           ? "The invoice was read and every field passed server validation."

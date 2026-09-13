@@ -161,6 +161,7 @@ type IntakeDraft = {
   description: IntakeField<string>;
   readyToCreate: boolean;
   blockers: string[];
+  flaggedText: string | null;
   confidence: "LOW" | "MEDIUM" | "HIGH";
   requiresFieldReview: boolean;
   injectionSuspected: boolean;
@@ -378,6 +379,29 @@ function selective(bill: BillCase) {
   return bill.arrivedByIntake;
 }
 
+/**
+ * Splits a document so the flagged sentence can be marked in place. The quote comes back
+ * as one line while the document may wrap it across several, so whitespace is matched
+ * loosely rather than literally.
+ */
+function highlightParts(body: string, flagged: string | null) {
+  const plain = [{ text: body, flagged: false }];
+  if (!flagged) return plain;
+
+  const pattern = flagged
+    .trim()
+    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    .replace(/\s+/g, "\\s+");
+  const match = new RegExp(pattern, "i").exec(body);
+  if (!match) return plain;
+
+  return [
+    { text: body.slice(0, match.index), flagged: false },
+    { text: match[0], flagged: true },
+    { text: body.slice(match.index + match[0].length), flagged: false },
+  ].filter((part) => part.text.length > 0);
+}
+
 function relativeTime(value: string) {
   const parsed = Date.parse(value);
   if (Number.isNaN(parsed)) return "";
@@ -450,6 +474,7 @@ export default function APWorkbench() {
   const [confirmed, setConfirmed] = useState<ConfirmedIntake | null>(null);
   const [fieldsReviewed, setFieldsReviewed] = useState(false);
   const [inbox, setInbox] = useState<InboxMessage[] | null>(null);
+  const [sourceDoc, setSourceDoc] = useState<{ attachment: string | null; fromName: string | null; body: string } | null>(null);
   const [openMessageId, setOpenMessageId] = useState<string | null>(null);
   const [pasteMode, setPasteMode] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
@@ -588,6 +613,7 @@ export default function APWorkbench() {
       if (!response.ok) throw new Error(body.error || "Could not read the invoice");
       const draft = body.draft as IntakeDraft;
       setIntakeDraft(draft);
+      setSourceDoc(body.sourceMessage || null);
       setOpenMessageId(messageId || null);
       setFieldsReviewed(false);
       setConfirmed({
@@ -634,6 +660,7 @@ export default function APWorkbench() {
       setConfirmed(null);
       setFieldsReviewed(false);
       setIntakeText("");
+      setSourceDoc(null);
       setOpenMessageId(null);
       setStage("REVIEW");
       await Promise.all([refresh("INTAKE"), loadInbox()]);
@@ -931,8 +958,22 @@ export default function APWorkbench() {
                   {intakeDraft.injectionSuspected && (
                     <div className="intakeWarning">
                       <strong>Instruction-like text reported in this document.</strong>
+                      {intakeDraft.flaggedText && <blockquote>{intakeDraft.flaggedText}</blockquote>}
                       <p>It was read as data. This is a heuristic signal, not a control — the field checks below are what actually hold, whatever the document says.</p>
                     </div>
+                  )}
+
+                  {sourceDoc && (
+                    <details className="sourceDoc" open>
+                      <summary>
+                        <span>Source document</span>
+                        {sourceDoc.attachment && <em>{sourceDoc.attachment}</em>}
+                      </summary>
+                      <pre>{highlightParts(sourceDoc.body, intakeDraft.flaggedText).map((part, index) => (
+                        part.flagged ? <mark key={index}>{part.text}</mark> : <span key={index}>{part.text}</span>
+                      ))}</pre>
+                      <p>Text the OCR step returned for this attachment. Every field above was read from it &mdash; check them against it.</p>
+                    </details>
                   )}
 
                   <div className="intakeGrid">
@@ -982,7 +1023,7 @@ export default function APWorkbench() {
                   )}
 
                   <div className="intakeActions">
-                    <button type="button" className="linkButton" onClick={() => { setIntakeDraft(null); setConfirmed(null); setFieldsReviewed(false); }}>Discard draft</button>
+                    <button type="button" className="linkButton" onClick={() => { setIntakeDraft(null); setConfirmed(null); setFieldsReviewed(false); setSourceDoc(null); }}>Discard draft</button>
                     <button
                       className="primaryButton intakeRun"
                       type="button"
