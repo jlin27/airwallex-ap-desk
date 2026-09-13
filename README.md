@@ -57,6 +57,22 @@ reports instruction-like text it sees — surfaced as a signal, explicitly not a
 
 `examples/invoices/05-prompt-injection.txt` carries instructions addressed to the agent.
 
+## Sample invoices
+
+`examples/invoices/*.txt` are plain-text invoices for pasting straight in.
+`examples/invoices/pdf/*.pdf` are the same invoices as real documents — the attachments
+the AP inbox names. Regenerate them with:
+
+```bash
+python3 examples/invoices/make-pdf.py            # all
+python3 examples/invoices/make-pdf.py NC-1043    # one
+```
+
+Worth trying: extract `NC-1043.pdf` and paste the result in. Its letterhead reads
+"Northstar Cloud, Inc." while the Airwallex vendor record is "Northstar Cloud", so the
+exact-match rule rejects it and offers the near miss for a person to confirm — the case
+a substring match would have bound silently.
+
 ## Run locally
 
 ```bash
