@@ -1331,32 +1331,37 @@ export default function APWorkbench() {
             {!currentAnalysis ? (
               <div className="agentStart">
                 <span className="agentGlyph">✦</span>
-                <h2>Waiting for triage</h2>
-                <p>Every open bill is reviewed automatically after each Airwallex refresh. Server code decides the outcome; the model explains it. You remain in control of payment.</p>
+                {selected && apQueueStatus(selected) === "CLOSED" ? (
+                  <>
+                    <h2>This case is closed</h2>
+                    <p>A person confirmed the exception, so the agent has nothing left to explain. Reopen the case to review it again. You remain in control of payment.</p>
+                  </>
+                ) : selected && apQueueStatus(selected) === "ON_HOLD" ? (
+                  <>
+                    <h2>Waiting on someone</h2>
+                    <p>This case is on hold pending information or a correction. Server code decides the outcome; the model explains it. You remain in control of payment.</p>
+                  </>
+                ) : (
+                  <>
+                    <h2>Waiting for triage</h2>
+                    <p>Every open bill is reviewed automatically after each Airwallex refresh. Server code decides the outcome; the model explains it. You remain in control of payment.</p>
+                  </>
+                )}
               </div>
             ) : (
               <div className="agentResult">
                 <span className={`decisionPill ${recommendation?.recommendation === "READY_TO_VALIDATE" ? "ready" : "review"}`}>{recommendation && recommendationLabels[recommendation.recommendation]}</span>
                 <h2>{recommendation?.summary}</h2>
-                <p className="decisionSource">Server decision · explained by the {recommendation?.source === "AI_GATEWAY" ? "model" : "fallback"}</p>
-                <p className="confidenceLine">{recommendation?.suggestedCategory.replaceAll("_", " ")} · {recommendation?.confidence.toLowerCase()} confidence</p>
+                <p className="decisionSource">Server decision · explained by the {recommendation?.source === "AI_GATEWAY" ? "model" : "fallback"} · {recommendation?.confidence.toLowerCase()} confidence · <span className="decisionCategory">{recommendation?.suggestedCategory.replaceAll("_", " ").toLowerCase()}</span></p>
                 <ul>{recommendation?.reasons.map((reason) => {
                   const tone = reasonTone(reason, selected);
                   return <li className={`reasonItem ${tone}`} key={reason}><span aria-hidden="true">{reasonIcons[tone]}</span>{reason}</li>;
                 })}</ul>
                 {recommendation?.source === "SAFE_FALLBACK" && <p className="fallbackText">Live model reasoning was unavailable. The same server-established facts and safety gates remain in force.</p>}
 
-                <section className="assistantSection" aria-labelledby="bill-assistant-title">
-                  <div className="assistantHeader">
-                    <div><p className="eyebrow">Bill-specific assistant</p><h3 id="bill-assistant-title">Ask about this bill</h3></div>
-                    <span className="assistantScope">{selected?.vendor} only</span>
-                  </div>
-
+                <section className="assistantSection" aria-label="Ask about this bill">
+                  {assistantMessages.length > 0 && (
                   <div className="assistantMessages" aria-live="polite">
-                    <div className="assistantMessage assistant">
-                      <div><strong>AI assistant</strong><span>Verified facts + judgment</span></div>
-                      <p>{recommendation?.summary} Ask why it was flagged, what evidence would clear it, or for a draft follow-up.</p>
-                    </div>
                     {assistantMessages.map((message) => (
                       <div className={`assistantMessage ${message.role === "USER" ? "user" : "assistant"}`} key={message.id}>
                         <div>
@@ -1367,9 +1372,11 @@ export default function APWorkbench() {
                         <p>{message.text}</p>
                       </div>
                     ))}
-                    {assistantLoading && <div className="assistantThinking"><span className="loader" />Reviewing the current bill facts…</div>}
                   </div>
+                  )}
+                  {assistantLoading && <div className="assistantThinking"><span className="loader" />Reviewing the current bill facts…</div>}
 
+                  <p className="assistantLead">Ask the agent about {selected?.vendor || "this bill"}</p>
                   <div className="assistantPrompts" aria-label="Suggested questions">
                     <button type="button" disabled={assistantLoading} onClick={() => askAssistant("Why was this bill flagged?", "Question")}>Why was this flagged?</button>
                     <button type="button" disabled={assistantLoading} onClick={() => askAssistant("What evidence would clear this exception?", "Question")}>What evidence would clear it?</button>
@@ -1377,9 +1384,10 @@ export default function APWorkbench() {
                   </div>
 
                   <form className="assistantComposer" onSubmit={(event) => { event.preventDefault(); askAssistant(assistantQuestion); }}>
-                    <label htmlFor="assistant-question">Ask a question or add context</label>
+                    <label className="visuallyHidden" htmlFor="assistant-question">Ask a question or add context</label>
                     <textarea
                       id="assistant-question"
+                      rows={2}
                       maxLength={1000}
                       value={assistantQuestion}
                       onChange={(event) => setAssistantQuestion(event.target.value)}
