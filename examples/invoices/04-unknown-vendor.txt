@@ -1,0 +1,14 @@
+From: ap@brightpathlegal.example
+Subject: Invoice BPL-2291
+
+Dear Accounts Payable,
+
+Please arrange payment for the advisory work completed last quarter.
+
+Vendor: Brightpath Legal Partners
+Invoice Number: BPL-2291
+Description: Contract review and advisory services
+Total Due: USD 3200.00
+Due Date: 2026-10-30
+
+Brightpath Legal Partners

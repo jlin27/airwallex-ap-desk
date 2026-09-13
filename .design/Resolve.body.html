@@ -1,0 +1,142 @@
+<!-- {"nav":"exceptions","step":3,"billCount":6,"css":".workbench { display: grid; grid-template-columns: minmax(300px, .78fr) minmax(450px, 1.25fr) minmax(320px, .82fr); border: 1px solid var(--line); border-radius: 10px; background: var(--panel); box-shadow: 0 8px 28px rgba(28, 38, 32, .04); overflow: hidden; height: 640px; }\n.billQueue { min-width: 0; border-right: 1px solid var(--line); background: #fbfcfb; }\n.queueHeader { min-height: 78px; padding: 17px 18px 14px; display: flex; align-items: center; justify-content: space-between; }\n.queueHeader h2 { margin: 0; font-size: 17px; letter-spacing: -.025em; }\n.queueHeader > span { min-width: 25px; height: 25px; padding: 0 7px; display: grid; place-items: center; border-radius: 13px; background: #e8ebe8; color: #5d6661; font-size: 10px; font-weight: 800; }\n.filterTabs { padding: 0 12px 12px; display: flex; gap: 4px; border-bottom: 1px solid var(--line); }\n.filterTabs span { min-height: 30px; padding: 0 8px; display: inline-flex; align-items: center; border-radius: 5px; color: #78817c; font-size: 10px; font-weight: 700; }\n.filterTabs span.active { background: #e9edea; color: var(--ink); }\n.billRow { min-height: 104px; padding: 15px 14px; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: start; gap: 10px; border-bottom: 1px solid #e8ebe9; }\n.billRow.selected { background: #eef4f0; box-shadow: inset 3px 0 var(--green); }\n.vendorAvatar { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid #d8ded9; border-radius: 8px; background: white; color: #526159; font-size: 10px; font-weight: 850; }\n.billRowMain strong, .billRowMain small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n.billRowMain strong { margin-top: 1px; font-size: 12px; }\n.billRowMain small { margin-top: 5px; color: var(--muted); font-size: 9px; }\n.recommendationTag { width: fit-content; margin-top: 10px; padding: 4px 6px; border-radius: 4px; font-size: 8px; font-style: normal; font-weight: 800; text-transform: uppercase; letter-spacing: .035em; }\n.recommendationTag.review { background: var(--amber-soft); color: var(--amber); }\n.recommendationTag.ready { background: var(--green-soft); color: var(--green); }\n.billAmount { padding-top: 1px; text-align: right; font-size: 11px; font-weight: 750; }\n.billAmount small { margin-top: 4px; display: block; color: #929a95; font-size: 8px; }\n.billReview { min-width: 0; border-right: 1px solid var(--line); }\n.reviewHeader { padding: 24px 25px 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--line); }\n.reviewHeader h2 { margin-bottom: 7px; font-size: 21px; letter-spacing: -.035em; }\n.reviewHeader p:last-child { max-width: 360px; margin: 0; color: var(--muted); font-size: 11px; }\n.reviewAmount { min-width: 125px; text-align: right; }\n.reviewAmount span, .reviewAmount small { display: block; color: var(--muted); font-size: 9px; }\n.reviewAmount strong { margin: 5px 0; display: block; font-size: 20px; letter-spacing: -.035em; }\n.resolutionSection { padding: 18px 24px 20px; }\n.billComparison { margin-top: 12px; padding: 13px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; border: 1px solid #cbd9d1; border-radius: 7px; background: #f7faf8; }\n.billComparison span, .billComparison strong, .billComparison small { display: block; }\n.billComparison span { color: var(--muted); font-size: 8px; }\n.billComparison strong { margin-top: 5px; font-size: 10px; }\n.billComparison p { margin: 4px 0; font-size: 13px; font-weight: 780; }\n.billComparison small { color: #7c8580; font-size: 8px; line-height: 1.35; }\n.billComparison > b { padding: 4px 6px; border-radius: 9px; background: #e3e9e5; color: #718078; font-size: 7px; text-transform: uppercase; }\n.resolutionActions { margin-top: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }\n.resolutionActions span { min-height: 34px; padding: 0 9px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--line-strong); border-radius: 6px; background: white; color: #4d5851; font-size: 9px; font-weight: 720; text-align: center; }\n.resolutionActions .approveAction { border-color: #b7d6c4; color: var(--green); background: #f5faf7; }\n.resolutionActions .dangerAction { border-color: #e0b8b3; color: var(--red); }\n.resolutionForm { margin-top: 12px; padding: 13px; border: 1px solid #d5ddd8; border-radius: 7px; background: #fafbfa; }\n.resolutionForm > label { display: block; color: #4d5751; font-size: 9px; font-weight: 750; }\n.noteArea { margin-top: 8px; padding: 10px; min-height: 82px; border: 1px solid var(--green); border-radius: 6px; background: white; color: var(--ink); font: 10px/1.5 \"Geist\", Arial, sans-serif; outline: 2px solid rgba(19, 113, 74, .18); }\n.resolutionForm .formGuidance { margin: 8px 0 0; color: #6d7771; font-size: 8px; line-height: 1.45; }\n.formRow { margin-top: 9px; display: flex; justify-content: flex-end; gap: 7px; }\n.formRow span { min-height: 34px; padding: 0 11px; display: inline-flex; align-items: center; border: 1px solid var(--line-strong); border-radius: 6px; background: white; color: #4d5851; font-size: 9px; font-weight: 720; }\n.formRow .primaryButton { min-height: 34px; font-size: 9px; }\n.auditPreview { margin-top: 13px; padding: 12px 13px; border: 1px solid var(--line); border-radius: 7px; background: white; }\n.auditPreview > span { display: block; color: var(--muted); font: 750 8px var(--mono); text-transform: uppercase; letter-spacing: .04em; }\n.auditPreview dl { margin: 9px 0 0; display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 6px 12px; }\n.auditPreview dt { color: #8b948f; font: 750 8px var(--mono); text-transform: uppercase; }\n.auditPreview dd { margin: 0; font-size: 9px; color: #4f5953; }\n.agentPanel { min-width: 0; padding: 22px 20px 0; background: #f9faf9; }\n.agentPanelHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }\n.agentPanelHeader .eyebrow { margin: 0; }\n.assistantSection { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); }\n.assistantHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }\n.assistantHeader h3 { margin: 0; font-size: 14px; letter-spacing: -.02em; }\n.assistantScope { padding: 4px 6px; border-radius: 4px; background: #ecefed; color: #6e7772; font: 700 8px var(--mono); text-transform: uppercase; }\n.assistantMessages { margin-top: 15px; display: grid; gap: 14px; }\n.assistantMessage { padding-left: 11px; border-left: 3px solid var(--blue); }\n.assistantMessage.user { border-left-color: #c5862e; }\n.assistantMessage > div { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }\n.assistantMessage strong { font-size: 10px; }\n.assistantMessage span { padding: 3px 5px; border-radius: 4px; background: var(--blue-soft); color: var(--blue); font: 700 7px var(--mono); text-transform: uppercase; }\n.assistantMessage span.unverified { background: var(--amber-soft); color: var(--amber); }\n.assistantMessage p { margin: 6px 0 0; color: #4f5953; font-size: 10px; line-height: 1.55; }\n.assistantComposer { margin-top: 14px; padding: 9px 11px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid var(--line-strong); border-radius: 7px; background: white; }\n.assistantComposer em { color: #a3aca7; font-size: 10px; font-style: normal; }\n.assistantComposer b { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 6px; background: #26332c; color: white; font-size: 11px; }"} -->
+<header class="apHeader">
+  <div>
+    <p class="eyebrow">Accounts payable</p>
+    <h1>Resolve exception</h1>
+    <p>The server will not lift the block. A person decides, and the decision is recorded.</p>
+  </div>
+  <div class="headerTools">
+    <span class="ghostButton">Demo data</span>
+    <span class="secondaryButton">Refresh Airwallex</span>
+  </div>
+</header>
+
+__RAIL__
+
+<div class="workbench">
+  <section class="billQueue">
+    <div class="queueHeader">
+      <div><p class="eyebrow">Inbox</p><h2>Bills</h2></div>
+      <span>3</span>
+    </div>
+    <div class="filterTabs">
+      <span>All</span><span class="active">Needs attention</span><span>Ready</span>
+    </div>
+    <div class="billRow selected">
+      <span class="vendorAvatar">NC</span>
+      <div class="billRowMain">
+        <strong>Northstar Cloud</strong>
+        <small>NC-1043 &middot; Due Oct 15</small>
+        <i class="recommendationTag review">Amount changed</i>
+      </div>
+      <div class="billAmount">$142.00<small>USD</small></div>
+    </div>
+    <div class="billRow">
+      <span class="vendorAvatar">SN</span>
+      <div class="billRowMain">
+        <strong>Studio North</strong>
+        <small>SN-552 &middot; Due Oct 5</small>
+        <i class="recommendationTag review">Possible duplicate</i>
+      </div>
+      <div class="billAmount">$500.00<small>USD</small></div>
+    </div>
+    <div class="billRow">
+      <span class="vendorAvatar">NC</span>
+      <div class="billRowMain">
+        <strong>Northstar Cloud</strong>
+        <small>NC-0901 &middot; Due Oct 12</small>
+        <i class="recommendationTag review">Amount changed</i>
+      </div>
+      <div class="billAmount">$138.00<small>USD</small></div>
+    </div>
+  </section>
+
+  <section class="billReview">
+    <div class="reviewHeader">
+      <div>
+        <p class="eyebrow">Invoice NC-1043</p>
+        <h2>Northstar Cloud</h2>
+        <p>Cloud infrastructure subscription</p>
+      </div>
+      <div class="reviewAmount">
+        <span>Bill amount</span>
+        <strong>$142.00</strong>
+        <small>42% above average</small>
+      </div>
+    </div>
+
+    <div class="resolutionSection">
+      <div class="sectionTitle">
+        <div><p class="eyebrow">Exception workflow</p><h3>Resolve amount change</h3></div>
+      </div>
+
+      <div class="billComparison">
+        <div>
+          <span>Prior average &middot; 2 bills</span>
+          <p>$100.00</p>
+          <small>NC-0801, NC-0701</small>
+        </div>
+        <b>+42%</b>
+        <div>
+          <span>This bill &middot; NC-1043</span>
+          <p>$142.00</p>
+          <small>Arrived by intake today</small>
+        </div>
+      </div>
+
+      <div class="resolutionActions">
+        <span class="approveAction">Approve variance</span>
+        <span>Request explanation</span>
+        <span class="dangerAction">Dispute bill</span>
+      </div>
+
+      <div class="resolutionForm">
+        <label>Why is this variance acceptable?</label>
+        <div class="noteArea">Capacity upgrade approved by Platform on 3 Sep. Renewal notice on file matches the new rate.</div>
+        <p class="formGuidance">This note is stored with the bill and shown on every later view of this case.</p>
+        <div class="formRow">
+          <span>Cancel</span>
+          <span class="primaryButton">Approve variance</span>
+        </div>
+      </div>
+
+      <div class="auditPreview">
+        <span>Record that will be written</span>
+        <dl>
+          <dt>Action</dt><dd>APPROVED_VARIANCE</dd>
+          <dt>Bill</dt><dd>NC-1043 &middot; Northstar Cloud &middot; $142.00 USD</dd>
+          <dt>Actor</dt><dd>Demo operator &mdash; unauthenticated session</dd>
+          <dt>Effect</dt><dd>Unblocks payout validation. Does not move money.</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <aside class="agentPanel">
+    <div class="agentPanelHeader">
+      <p class="eyebrow">AP exception agent</p>
+      <span class="modelBadge live">Live model</span>
+    </div>
+
+    <div class="assistantSection">
+      <div class="assistantHeader">
+        <h3>Ask about this bill</h3>
+        <span class="assistantScope">NC-1043 only</span>
+      </div>
+      <div class="assistantMessages">
+        <div class="assistantMessage user">
+          <div><strong>You</strong></div>
+          <p>Platform told me the capacity upgrade explains this. Can I approve it?</p>
+        </div>
+        <div class="assistantMessage">
+          <div><strong>Agent</strong><span class="unverified">Unverified context</span></div>
+          <p>That context may explain the increase, but it is not verified against anything on file. The 42% variance still requires a human decision. Approving it records this session against the reason you give &mdash; the server will not clear it on the model's word.</p>
+        </div>
+      </div>
+      <div class="assistantComposer">
+        <em>Ask a question about this bill&hellip;</em>
+        <b>&#8593;</b>
+      </div>
+    </div>
+  </aside>
+</div>

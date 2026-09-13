@@ -1,0 +1,15 @@
+From: billing@studionorth.example
+Subject: Reminder - invoice SN-552 outstanding
+
+Hi team,
+
+We have not received payment for the invoice below. Please process at your earliest convenience.
+
+Vendor: Studio North
+Invoice Number: SN-552
+Description: Product design services
+Total Due: USD 500.00
+Due Date: 2026-10-05
+
+Thanks,
+Studio North Billing

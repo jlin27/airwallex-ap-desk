@@ -1,0 +1,57 @@
+<!-- {"nav":"intake","step":null,"billCount":5,"css":".mapWrap { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 22px; }\n.mapCard { padding: 20px 22px 22px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }\n.mapCard.now { background: #fbfbfa; }\n.mapCard > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }\n.mapCard h2 { margin: 0; font-size: 16px; letter-spacing: -.03em; }\n.mapBadge { padding: 4px 7px; border-radius: 4px; font: 750 8px var(--mono); text-transform: uppercase; letter-spacing: .05em; }\n.mapBadge.now { background: #edf0ee; color: #6e7772; }\n.mapBadge.next { background: var(--green-soft); color: var(--green); }\n.stack { display: grid; gap: 6px; }\n.block { padding: 11px 13px; display: flex; align-items: center; gap: 11px; border: 1px solid var(--line); border-radius: 7px; background: white; }\n.block.setup { border-style: dashed; background: #fafbfa; }\n.block.dead { border-color: #e3d3cf; background: #fdf7f6; }\n.block.core { border-color: #bcd7c7; background: #f5faf7; }\n.block.agent { border-color: #cfe0ea; background: var(--blue-soft); }\n.block i { flex: 0 0 auto; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 6px; font: 800 9px var(--mono); font-style: normal; background: #edf0ee; color: #7b8580; }\n.block.core i { background: var(--green-soft); color: var(--green); }\n.block.agent i { background: #dbe8f0; color: var(--blue); }\n.block.dead i { background: var(--red-soft); color: var(--red); }\n.block strong { display: block; font-size: 11px; }\n.block small { margin-top: 3px; display: block; color: var(--muted); font-size: 9px; }\n.block em { margin-left: auto; flex: 0 0 auto; padding: 3px 6px; border-radius: 4px; background: #edf0ee; color: #7b8580; font: 700 7px var(--mono); font-style: normal; text-transform: uppercase; }\n.block.dead em { background: var(--red-soft); color: var(--red); }\n.block.agent em { background: #dbe8f0; color: var(--blue); }\n.foldLabel { margin: 9px 0 4px; color: #a3aca7; font: 750 8px var(--mono); text-transform: uppercase; letter-spacing: .06em; }\n.legend { margin-top: 20px; padding: 14px 18px; display: flex; align-items: center; gap: 22px; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); }\n.legend div { display: flex; align-items: center; gap: 8px; }\n.legend i { width: 11px; height: 11px; border-radius: 3px; border: 1px solid var(--line); }\n.legend i.core { border-color: #bcd7c7; background: #f5faf7; }\n.legend i.agent { border-color: #cfe0ea; background: var(--blue-soft); }\n.legend i.setup { border-style: dashed; background: #fafbfa; }\n.legend i.dead { border-color: #e3d3cf; background: #fdf7f6; }\n.legend span { color: var(--muted); font-size: 10px; font-weight: 650; }"} -->
+<header class="apHeader">
+  <div>
+    <p class="eyebrow">Phase 3 &middot; Structural change</p>
+    <h1>Inverting the flow</h1>
+    <p>Same engine. The agent moves from decoration at the top to the front door.</p>
+  </div>
+</header>
+
+<div class="mapWrap">
+  <section class="mapCard now">
+    <header>
+      <h2>Today</h2>
+      <span class="mapBadge now">Shipped</span>
+    </header>
+    <p class="foldLabel">Above the fold</p>
+    <div class="stack">
+      <div class="block setup"><i>1</i><div><strong>Demo setup bar</strong><small>Generate demo bills</small></div><em>Setup</em></div>
+      <div class="block setup"><i>2</i><div><strong>Triage banner</strong><small>Status of a job that already ran</small></div><em>Setup</em></div>
+      <div class="block setup"><i>3</i><div><strong>Intake panel</strong><small>Collapsed by default</small></div><em>Setup</em></div>
+      <div class="block"><i>4</i><div><strong>Summary grid</strong><small>Four counters</small></div></div>
+    </div>
+    <p class="foldLabel">Below the fold</p>
+    <div class="stack">
+      <div class="block core"><i>5</i><div><strong>Queue, facts, exception workflow</strong><small>The product</small></div><em>Core</em></div>
+      <div class="block agent"><i>6</i><div><strong>Run agent review</strong><small>Re-runs what triage already did</small></div><em>Agent</em></div>
+      <div class="block agent"><i>7</i><div><strong>Bill assistant</strong><small>Reloads every bill per message</small></div><em>Agent</em></div>
+      <div class="block dead"><i>8</i><div><strong>Validate payout</strong><small>Ends on &ldquo;nothing happened&rdquo;</small></div><em>Dead end</em></div>
+    </div>
+  </section>
+
+  <section class="mapCard">
+    <header>
+      <h2>Proposed</h2>
+      <span class="mapBadge next">Phase 3</span>
+    </header>
+    <p class="foldLabel">One pipeline, five steps</p>
+    <div class="stack">
+      <div class="block agent"><i>1</i><div><strong>Intake is the front door</strong><small>Paste an invoice &mdash; the only place the model reads free text</small></div><em>Agent</em></div>
+      <div class="block core"><i>2</i><div><strong>Server validates six fields</strong><small>Vendor, currency, amount, invoice, date, description</small></div><em>Core</em></div>
+      <div class="block core"><i>3</i><div><strong>Bill enters the queue</strong><small>Exception checks run on arrival</small></div><em>Core</em></div>
+      <div class="block core"><i>4</i><div><strong>Person resolves, with a reason</strong><small>Assistant explains; it cannot clear the block</small></div><em>Core</em></div>
+      <div class="block core"><i>5</i><div><strong>Decision record + release</strong><small>Validated payout, funding line, full trail</small></div><em>Core</em></div>
+    </div>
+    <p class="foldLabel">Removed</p>
+    <div class="stack">
+      <div class="block dead"><i>&#10007;</i><div><strong>Two setup strips and a duplicate agent button</strong><small>Demo setup moves to the header; Run agent review deleted</small></div><em>Cut</em></div>
+    </div>
+  </section>
+</div>
+
+<div class="legend">
+  <div><i class="agent"></i><span>Model does work no rule can do</span></div>
+  <div><i class="core"></i><span>Server decides &mdash; deterministic</span></div>
+  <div><i class="setup"></i><span>Scaffolding shown to the user</span></div>
+  <div><i class="dead"></i><span>Dead end or cut</span></div>
+</div>

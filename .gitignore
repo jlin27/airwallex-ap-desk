@@ -1,0 +1,20 @@
+.env
+.env.local
+.probe-results/
+node_modules/
+.next/
+dist/
+.vinext/
+.wrangler/
+*.log
+
+# OS / editor
+.DS_Store
+
+# TypeScript incremental build state
+*.tsbuildinfo
+
+# Generated design-canvas artefacts — the sources are the .body.html files,
+# _shell.css, canvas.json and build.mjs. Regenerate with: node .design/build.mjs
+.design/*.dc.html
+.design/ap-desk-flow.html

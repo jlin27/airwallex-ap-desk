@@ -1,0 +1,17 @@
+From: accounts@aupayrollbureau.example
+Subject: Payroll invoice PAY-1002 for October
+
+Hello Accounts Payable,
+
+Please find this month's payroll processing invoice attached below.
+
+Vendor: OB-1001 AU Payroll Bureau
+Invoice Number: PAY-1002
+Description: Monthly payroll processing
+Total Due: AUD 100.00
+Due Date: 2026-10-20
+
+Payment terms are net 30 from the issue date.
+
+Kind regards,
+Accounts Team

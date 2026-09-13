@@ -1,0 +1,125 @@
+<!-- {"nav":"bills","step":4,"billCount":6,"css":".decisionStage { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 18px; }\n.decisionCard { padding: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); box-shadow: 0 8px 28px rgba(28, 38, 32, .04); overflow: hidden; }\n.decisionHero { padding: 20px 26px 18px; border-bottom: 1px solid var(--line); background: var(--green-soft); }\n.decisionHero > span { color: var(--green); font: 750 9px var(--mono); text-transform: uppercase; letter-spacing: .06em; }\n.decisionHero h2 { margin: 11px 0 7px; color: #10523a; font-size: 23px; letter-spacing: -.035em; }\n.decisionHero p { margin: 0; max-width: 56ch; color: #41715a; font-size: 12px; line-height: 1.55; }\n.payoutGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-bottom: 1px solid var(--line); }\n.payoutGrid > div { min-height: 76px; padding: 14px 18px; border-right: 1px solid var(--line); }\n.payoutGrid > div:last-child { border-right: 0; }\n.payoutGrid span, .payoutGrid strong, .payoutGrid small { display: block; }\n.payoutGrid span { color: var(--muted); font-size: 9px; }\n.payoutGrid strong { margin-top: 7px; font-size: 15px; letter-spacing: -.03em; }\n.payoutGrid small { margin-top: 5px; color: #929a95; font-size: 9px; }\n.fundingStrip { padding: 13px 26px; display: flex; align-items: center; justify-content: space-between; gap: 18px; border-bottom: 1px solid var(--line); background: #f7faf8; }\n.fundingStrip strong { display: block; font-size: 12px; }\n.fundingStrip small { margin-top: 5px; display: block; color: var(--muted); font-size: 9px; }\n.fxTag { padding: 5px 8px; border: 1px solid #c6ddcf; border-radius: 12px; background: white; color: var(--green); font: 700 8px var(--mono); text-transform: uppercase; white-space: nowrap; }\n.trailSection { padding: 18px 26px 20px; }\n.trailList { margin-top: 14px; display: grid; gap: 0; }\n.trailItem { display: grid; grid-template-columns: 23px minmax(0, 1fr); gap: 13px; }\n.trailMark { display: flex; flex-direction: column; align-items: center; }\n.trailMark i { width: 23px; height: 23px; display: grid; place-items: center; border-radius: 50%; background: var(--green-soft); color: var(--green); font: 850 10px var(--mono); font-style: normal; }\n.trailMark b { width: 1px; flex: 1 1 auto; min-height: 22px; background: var(--line); }\n.trailBody { padding-bottom: 14px; }\n.trailItem:last-child .trailBody { padding-bottom: 0; }\n.trailBody strong { display: block; font-size: 11px; }\n.trailBody p { margin: 5px 0 0; color: var(--muted); font-size: 9px; line-height: 1.5; }\n.trailBody code { padding: 2px 5px; border-radius: 3px; background: #eef1ef; color: #4f5953; font: 8px var(--mono); }\n.sideRail { display: grid; gap: 14px; align-content: start; }\n.railCard { border: 1px solid var(--line); border-radius: 10px; background: var(--panel); overflow: hidden; }\n.railHead { padding: 15px 16px 13px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line); }\n.railHead h3 { margin: 0; font-size: 13px; letter-spacing: -.02em; }\n.boundaryRow { padding: 12px 16px; display: flex; align-items: flex-start; gap: 10px; border-bottom: 1px solid #e8ebe9; }\n.boundaryRow:last-child { border-bottom: 0; }\n.boundaryRow i { flex: 0 0 auto; width: 20px; height: 20px; display: grid; place-items: center; border-radius: 50%; font: 850 9px var(--mono); font-style: normal; }\n.boundaryRow i.no { background: #edf0ee; color: #7b8580; }\n.boundaryRow strong, .boundaryRow small { display: block; }\n.boundaryRow strong { font-size: 10px; color: #4f5953; }\n.boundaryRow small { margin-top: 4px; color: var(--muted); font-size: 9px; line-height: 1.45; }\n.nextCard { padding: 16px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }\n.nextCard h3 { margin: 0 0 9px; font-size: 13px; letter-spacing: -.02em; }\n.nextCard p { margin: 0 0 13px; color: var(--muted); font-size: 10px; line-height: 1.55; }\n.nextActions { display: grid; gap: 7px; }\n.nextActions span { min-height: 36px; padding: 0 11px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--line-strong); border-radius: 6px; background: white; color: #4d5851; font-size: 10px; font-weight: 720; }\n.nextActions .primaryButton { min-height: 36px; font-size: 10px; }"} -->
+<header class="apHeader">
+  <div>
+    <p class="eyebrow">Accounts payable</p>
+    <h1>Payout decision</h1>
+    <p>Every check passed and the decision is on the record. Money has not moved.</p>
+  </div>
+  <div class="headerTools">
+    <span class="ghostButton">Demo data</span>
+    <span class="secondaryButton">Refresh Airwallex</span>
+  </div>
+</header>
+
+__RAIL__
+
+<div class="decisionStage">
+  <section class="decisionCard">
+    <div class="decisionHero">
+      <span>Airwallex response &middot; VALIDATED</span>
+      <h2>NC-1043 is cleared for payment</h2>
+      <p>Airwallex accepted these payout instructions against the live beneficiary and funding route. No transfer was created &mdash; releasing it is a separate, human act.</p>
+    </div>
+
+    <div class="payoutGrid">
+      <div>
+        <span>Beneficiary</span>
+        <strong>Northstar Cloud</strong>
+        <small>LOCAL &middot; US ACH &middot; USD account</small>
+      </div>
+      <div>
+        <span>Payout</span>
+        <strong>$142.00</strong>
+        <small>USD &middot; reference NC-1043</small>
+      </div>
+      <div>
+        <span>Cleared by</span>
+        <strong>Demo operator</strong>
+        <small>12 Sep 2026, 09:41 UTC</small>
+      </div>
+    </div>
+
+    <div class="fundingStrip">
+      <div>
+        <strong>Funding $142.00 USD from the USD wallet</strong>
+        <small>Same-currency funding &mdash; no conversion required. $11,199,390.00 available.</small>
+      </div>
+      <span class="fxTag">No FX needed</span>
+    </div>
+
+    <div class="trailSection">
+      <div class="sectionTitle">
+        <div><p class="eyebrow">Audit trail</p><h3>How this bill got here</h3></div>
+        <span class="livePill"><i></i> Live API data</span>
+      </div>
+
+      <div class="trailList">
+        <div class="trailItem">
+          <div class="trailMark"><i>1</i><b></b></div>
+          <div class="trailBody">
+            <strong>Invoice pasted and read</strong>
+            <p>Six fields proposed by the model. Vendor, currency, amount, and invoice number validated against live Airwallex data before anything was written.</p>
+          </div>
+        </div>
+        <div class="trailItem">
+          <div class="trailMark"><i>2</i><b></b></div>
+          <div class="trailBody">
+            <strong>Bill created in Airwallex</strong>
+            <p><code>POST /api/v1/spend/bills/create</code> &middot; NC-1043 &middot; entered the queue as a normal bill record.</p>
+          </div>
+        </div>
+        <div class="trailItem">
+          <div class="trailMark"><i>3</i><b></b></div>
+          <div class="trailBody">
+            <strong>Amount exception raised</strong>
+            <p>42% above the prior average across 2 bills. Server blocked payout validation. The model explained the block but could not lift it.</p>
+          </div>
+        </div>
+        <div class="trailItem">
+          <div class="trailMark"><i>4</i><b></b></div>
+          <div class="trailBody">
+            <strong>Variance approved by a person</strong>
+            <p>&ldquo;Capacity upgrade approved by Platform on 3 Sep. Renewal notice on file matches the new rate.&rdquo; &mdash; Demo operator</p>
+          </div>
+        </div>
+        <div class="trailItem">
+          <div class="trailMark"><i>&#10003;</i></div>
+          <div class="trailBody">
+            <strong>Payout instructions validated</strong>
+            <p><code>POST /api/v1/transfers/validate</code> &rarr; VALIDATED. Beneficiary route and funding confirmed by Airwallex.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="sideRail">
+    <div class="railCard">
+      <div class="railHead">
+        <h3>What did not happen</h3>
+      </div>
+      <div class="boundaryRow">
+        <i class="no">&#10007;</i>
+        <div><strong>No transfer was created</strong><small>Validation confirms the instructions are payable. It does not queue, schedule, or send them.</small></div>
+      </div>
+      <div class="boundaryRow">
+        <i class="no">&#10007;</i>
+        <div><strong>No funds left the wallet</strong><small>The USD balance is unchanged.</small></div>
+      </div>
+      <div class="boundaryRow">
+        <i class="no">&#10007;</i>
+        <div><strong>The model approved nothing</strong><small>Every state change on this bill was made by server code or by a person, on the record.</small></div>
+      </div>
+    </div>
+
+    <div class="nextCard">
+      <h3>Release this payment</h3>
+      <p>Releasing creates the transfer in Airwallex and is the only step in this flow that moves money. It sits outside the agent entirely.</p>
+      <div class="nextActions">
+        <span class="primaryButton">Release for payment</span>
+        <span>Export decision record</span>
+        <span>Return to queue</span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+From: billing@northstarcloud.example
+Subject: Invoice NC-1101 - Northstar Cloud
+
+Hi Accounts Payable,
+
+Your usage increased this period following the capacity upgrade.
+
+Vendor: Northstar Cloud
+Invoice Number: NC-1101
+Description: Cloud infrastructure subscription and additional capacity
+Total Due: USD 410.00
+Due Date: 2026-10-28
+
+Northstar Cloud Billing

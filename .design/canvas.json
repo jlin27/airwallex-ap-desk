@@ -1,0 +1,99 @@
+{
+  "artboards": [
+    {
+      "file": "FlowMap.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 880,
+      "title": "Why invert it"
+    },
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 1000,
+      "w": 1440,
+      "h": 900,
+      "title": "1 · Intake"
+    },
+    {
+      "file": "Validate.dc.html",
+      "x": 1560,
+      "y": 1000,
+      "w": 1440,
+      "h": 900,
+      "title": "2 · Server validation"
+    },
+    {
+      "file": "Queue.dc.html",
+      "x": 3120,
+      "y": 1000,
+      "w": 1440,
+      "h": 900,
+      "title": "3 · Queue"
+    },
+    {
+      "file": "Resolve.dc.html",
+      "x": 4680,
+      "y": 1000,
+      "w": 1440,
+      "h": 900,
+      "title": "4 · Resolve"
+    },
+    {
+      "file": "Decision.dc.html",
+      "x": 6240,
+      "y": 1000,
+      "w": 1440,
+      "h": 900,
+      "title": "5 · Decision"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "note-premise",
+      "x": 1560,
+      "y": 40,
+      "w": 460,
+      "text": "The engine stays. What moves is where the agent sits.\n\nToday the model classifies bills the server has already classified — it is handed the answer and asked to repeat it. In the proposed flow the model does the one job no rule can do (reading an invoice), and every decision after that is server code or a person on the record."
+    },
+    {
+      "id": "note-intake",
+      "x": 0,
+      "y": 1940,
+      "w": 420,
+      "text": "STEP 1 — Intake becomes the page, not a collapsed panel above the summary cards.\n\nThe three stacked setup strips are gone: demo data moves to a quiet header control. The queue survives as a right rail so you can still see what is waiting."
+    },
+    {
+      "id": "note-validate",
+      "x": 1560,
+      "y": 1940,
+      "w": 420,
+      "text": "STEP 2 — The guardrail that can actually fail.\n\nShown in its rejected state on purpose: the model read every field exactly as the document wrote them, and the server still refused, because the invoice is denominated in ZWL and this account holds no ZWL balance. Nothing was written to Airwallex.\n\nThe injection banner is reworded as an observation, not a guarantee — the field checks are what hold."
+    },
+    {
+      "id": "note-queue",
+      "x": 3120,
+      "y": 1940,
+      "w": 420,
+      "text": "STEP 3 — The operator corrected the currency to USD, and only then did the bill reach Airwallex as an ordinary record for the existing exception engine to pick up. This screen is almost unchanged from what you have built; it is the strongest part of the app.\n\nOne change: the agent panel says \"Server decision · explained by the model\" instead of implying the model decided."
+    },
+    {
+      "id": "note-resolve",
+      "x": 4680,
+      "y": 1940,
+      "w": 420,
+      "text": "STEP 4 — A person decides, and the record shows exactly what will be written before they commit.\n\nThe assistant exchange is the honest version: it acknowledges the user's context, marks it unverified, and declines to clear the block. The actor reads \"Demo operator — unauthenticated session\" rather than a fictional name."
+    },
+    {
+      "id": "note-decision",
+      "x": 6240,
+      "y": 1940,
+      "w": 460,
+      "text": "STEP 5 — The fix for \"it ends on a non-event.\"\n\nInstead of a lone VALIDATED toast, the flow lands on a decision record: the payout, the funding line (Phase 2's FX work), the full trail from paste to validation, and an explicit list of what did NOT happen.\n\n\"Release for payment\" is drawn as the one action that moves money and sits outside the agent. Wire it or cut it — but the flow needs a stated ending either way."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

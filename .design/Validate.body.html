@@ -1,0 +1,96 @@
+<!-- {"nav":"intake","step":1,"billCount":5,"css":".validateStage { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 18px; }\n.intakeCard { padding: 22px 26px 24px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); box-shadow: 0 8px 28px rgba(28, 38, 32, .04); }\n.draftHead { display: flex; align-items: center; justify-content: space-between; gap: 14px; }\n.draftHead h2 { margin: 0; font-size: 17px; letter-spacing: -.03em; }\n.fieldGrid { margin-top: 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px 20px; }\n.fieldBox > span { display: flex; align-items: center; gap: 7px; color: #4d5751; font-size: 11px; font-weight: 700; }\n.fieldBox input { width: 100%; margin-top: 7px; padding: 10px; border: 1px solid var(--line-strong); border-radius: 6px; background: white; color: var(--ink); font: 11px/1.5 var(--mono); }\n.fieldBox.bad input { border-color: #e0b8b3; background: #fefaf9; }\n.fieldBox small { margin-top: 5px; display: block; color: #929a95; font-size: 10px; line-height: 1.45; }\n.fieldBox.bad small { color: var(--red); }\n.blockerBox { margin-top: 18px; padding: 12px 14px; border: 1px solid #e1b5af; border-radius: 7px; background: var(--red-soft); }\n.blockerBox strong { display: block; color: var(--red); font-size: 12px; }\n.blockerBox p { margin: 6px 0 0; color: #8f4238; font-size: 11px; line-height: 1.5; }\n.draftFoot { margin-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 14px; }\n.draftFoot small { color: #929a95; font-size: 10px; }\n.primaryButton.disabled { border-color: #c3cac5; background: #c3cac5; color: #f4f5f3; }\n.linkish { color: var(--muted); font-size: 11px; font-weight: 650; text-decoration: underline; text-underline-offset: 3px; }\n.sideRail { display: grid; gap: 14px; align-content: start; }\n.railCard { border: 1px solid var(--line); border-radius: 10px; background: var(--panel); overflow: hidden; }\n.railHead { padding: 15px 16px 13px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line); }\n.railHead h3 { margin: 0; font-size: 13px; letter-spacing: -.02em; }\n.checkRow { padding: 12px 16px; display: flex; align-items: flex-start; gap: 10px; border-bottom: 1px solid #e8ebe9; }\n.checkRow:last-child { border-bottom: 0; }\n.checkRow i { flex: 0 0 auto; width: 20px; height: 20px; display: grid; place-items: center; border-radius: 50%; font: 850 9px var(--mono); font-style: normal; }\n.checkRow i.pass { background: var(--green-soft); color: var(--green); }\n.checkRow i.fail { background: var(--red-soft); color: var(--red); }\n.checkRow strong, .checkRow small { display: block; }\n.checkRow strong { font-size: 11px; }\n.checkRow small { margin-top: 4px; color: var(--muted); font-size: 9px; line-height: 1.45; }\n.noticeCard { padding: 14px 16px; border: 1px solid #e6d3a8; border-radius: 7px; background: var(--amber-soft); }\n.noticeCard strong { display: block; color: var(--amber); font-size: 11px; }\n.noticeCard p { margin: 6px 0 0; color: #7d520c; font-size: 10px; line-height: 1.5; }"} -->
+<header class="apHeader">
+  <div>
+    <p class="eyebrow">Accounts payable</p>
+    <h1>Intake</h1>
+    <p>The agent proposed six fields. Server code checked each one against live Airwallex data.</p>
+  </div>
+  <div class="headerTools">
+    <span class="ghostButton">Demo data</span>
+    <span class="secondaryButton">Refresh Airwallex</span>
+  </div>
+</header>
+
+__RAIL__
+
+<div class="validateStage">
+  <section class="intakeCard">
+    <div class="draftHead">
+      <h2>Proposed bill fields</h2>
+      <span class="modelBadge live">Live model</span>
+    </div>
+
+    <div class="fieldGrid">
+      <label class="fieldBox">
+        <span>Vendor <i class="statusChip ok">Validated</i></span>
+        <input value="Northstar Cloud" readonly>
+        <small>Matched the existing Airwallex vendor Northstar Cloud.</small>
+      </label>
+      <label class="fieldBox">
+        <span>Invoice number <i class="statusChip ok">Validated</i></span>
+        <input value="NC-1043" readonly>
+        <small>Read from the document.</small>
+      </label>
+      <label class="fieldBox">
+        <span>Amount <i class="statusChip ok">Validated</i></span>
+        <input value="142.00" readonly>
+        <small>Read from the document.</small>
+      </label>
+      <label class="fieldBox bad">
+        <span>Currency <i class="statusChip rejected">Rejected</i></span>
+        <input value="ZWL" readonly>
+        <small>ZWL is not a currency this Airwallex account holds a balance in.</small>
+      </label>
+      <label class="fieldBox">
+        <span>Due date <i class="statusChip ok">Validated</i></span>
+        <input value="2026-10-15" readonly>
+        <small>Read from the document.</small>
+      </label>
+      <label class="fieldBox">
+        <span>Description <i class="statusChip ok">Validated</i></span>
+        <input value="Cloud infrastructure subscription" readonly>
+        <small>Read from the document.</small>
+      </label>
+    </div>
+
+    <div class="blockerBox">
+      <strong>1 field blocks bill creation</strong>
+      <p>A supported currency is required. Correct the field above, or discard this draft. Nothing has been written to Airwallex.</p>
+    </div>
+
+    <div class="draftFoot">
+      <span class="linkish">Discard draft</span>
+      <span class="primaryButton disabled">Create bill in Airwallex</span>
+    </div>
+  </section>
+
+  <div class="sideRail">
+    <div class="railCard">
+      <div class="railHead">
+        <h3>Server checks</h3>
+        <span class="livePill"><i></i> Live API data</span>
+      </div>
+      <div class="checkRow">
+        <i class="pass">&#10003;</i>
+        <div><strong>Vendor exists in Airwallex</strong><small>Exact match required against GET /spend/vendors</small></div>
+      </div>
+      <div class="checkRow">
+        <i class="fail">&#10007;</i>
+        <div><strong>Currency is held by this account</strong><small>Checked against GET /balances/current</small></div>
+      </div>
+      <div class="checkRow">
+        <i class="pass">&#10003;</i>
+        <div><strong>Amount is positive and under ceiling</strong><small>Rejects above 1,000,000</small></div>
+      </div>
+      <div class="checkRow">
+        <i class="pass">&#10003;</i>
+        <div><strong>Invoice number is a usable reference</strong><small>Safe charset, 35 character limit</small></div>
+      </div>
+    </div>
+
+    <div class="noticeCard">
+      <strong>Instruction-like text reported</strong>
+      <p>The model reported that this document contains text addressed to the agent. It was read as data. This is a heuristic signal, not a control &mdash; the field checks above are what actually hold.</p>
+    </div>
+  </div>
+</div>
