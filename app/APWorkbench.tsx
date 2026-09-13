@@ -478,6 +478,7 @@ export default function APWorkbench() {
   const [openMessageId, setOpenMessageId] = useState<string | null>(null);
   const [pasteMode, setPasteMode] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [auditOpen, setAuditOpen] = useState(false);
   const [assistantQuestion, setAssistantQuestion] = useState("");
   const [assistantMessages, setAssistantMessages] = useState<AssistantMessage[]>([]);
   const [assistantLoading, setAssistantLoading] = useState(false);
@@ -833,8 +834,12 @@ export default function APWorkbench() {
         <header className="apHeader">
           <div>
             <p className="eyebrow">Accounts payable</p>
-            <h1>Bill review</h1>
-            <p>AI reviews incoming bills, explains exceptions, and recommends the safest next step.</p>
+            <h1>{stage === "INTAKE" ? "Intake" : stage === "DECISION" ? "Payout decision" : "Bill review"}</h1>
+            <p>{stage === "INTAKE"
+              ? "Invoices enter here. Nothing reaches Airwallex until the server validates it."
+              : stage === "DECISION"
+                ? "Every check passed and the decision is on the record. Money has not moved."
+                : "AI reviews incoming bills, explains exceptions, and recommends the safest next step."}</p>
           </div>
           <div className="headerTools">
             <button className="ghostButton" type="button" disabled={Boolean(loading)} onClick={() => post("seed")} title="Create a routine bill, a duplicate, and an amount-increase case using real Sandbox bill records">Demo data</button>
@@ -1487,12 +1492,23 @@ export default function APWorkbench() {
               <p>Calls appear here after every refresh, triage run, and payout validation. Credentials and record IDs stay on the server.</p>
             </div>
             <div className="apiActivityActions">
-              {apiActivity.length > 0 && <button onClick={() => setApiActivity([])}>Clear log</button>}
+              {auditOpen && apiActivity.length > 0 && <button onClick={() => setApiActivity([])}>Clear log</button>}
               <span className={`livePill ${loading ? "calling" : ""}`}><i /> {loading ? "Request active" : "Live log"}</span>
+              <button
+                className="auditToggle"
+                type="button"
+                aria-expanded={auditOpen}
+                aria-controls="api-activity-list"
+                onClick={() => setAuditOpen((current) => !current)}
+              >
+                {auditOpen ? "Hide" : "Show"} {apiActivity.length} call{apiActivity.length === 1 ? "" : "s"}
+                <svg viewBox="0 0 24 24" aria-hidden="true" className={auditOpen ? "flip" : ""}><path d="m6 9 6 6 6-6" /></svg>
+              </button>
             </div>
           </div>
 
-          <div className="apiCallList">
+          {auditOpen && (
+          <div className="apiCallList" id="api-activity-list">
             {loading && (
               <div className="apiCallRow pendingCall" aria-live="polite">
                 <span className="callPulse" />
@@ -1518,7 +1534,7 @@ export default function APWorkbench() {
               </div>
             )}
           </div>
-
+          )}
         </section>
         <p className="currencyNote">* Open value is a simple display total and does not convert currencies.</p>
       </main>

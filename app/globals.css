@@ -54,7 +54,7 @@ h1, h2, h3, p { margin-top: 0; }
 .apMain { width: 100%; max-width: 1600px; padding: 36px 40px 64px; }
 .apHeader { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
 .eyebrow { margin-bottom: 8px; color: #78817c; font: 750 10px var(--font-geist-mono), monospace; text-transform: uppercase; letter-spacing: .08em; }
-.apHeader h1 { margin-bottom: 7px; font-size: 30px; line-height: 1.1; letter-spacing: -.04em; }
+.apHeader h1 { margin-bottom: 7px; font-size: 24px; line-height: 1.15; letter-spacing: -.035em; }
 .apHeader > div > p:last-child { margin-bottom: 0; color: var(--muted); font-size: 14px; }
 .secondaryButton, .setupBar button { min-height: 38px; padding: 0 13px; border: 1px solid var(--line-strong); border-radius: 7px; background: white; color: var(--ink); font-size: 12px; font-weight: 700; }
 .secondaryButton:hover, .setupBar button:hover { border-color: #9ba59e; }
@@ -408,8 +408,8 @@ button.flowStep:hover:not(:disabled) strong { color: var(--ink); }
 .railStatus em { padding: 4px 6px; border-radius: 4px; background: #ecefed; color: #6e7772; font: 700 8px var(--font-geist-mono), monospace; font-style: normal; text-transform: uppercase; }
 .railStatus em.live { background: var(--blue-soft); color: var(--blue); }
 .headerTools { display: flex; align-items: center; gap: 8px; }
-.ghostButton { min-height: 38px; padding: 0 13px; display: inline-flex; align-items: center; border: 1px dashed var(--line-strong); border-radius: 7px; background: transparent; color: var(--muted); font-size: 12px; font-weight: 650; }
-.ghostButton:hover:not(:disabled) { border-color: #9ba59e; color: var(--ink); }
+.ghostButton { min-height: 38px; padding: 0 13px; display: inline-flex; align-items: center; border: 1px solid var(--line-strong); border-radius: 7px; background: white; color: var(--ink); font-size: 12px; font-weight: 700; }
+.ghostButton:hover:not(:disabled) { border-color: #9ba59e; }
 
 /* Decision record — the ending of the pipeline */
 .decisionStage { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 18px; }
@@ -533,3 +533,7 @@ button.flowStep:hover:not(:disabled) strong { color: var(--ink); }
 .agentPanel { position: relative; display: flex; flex-direction: column; }
 .agentPanel .agentResult { flex: 1 1 auto; }
 .payoutAction { position: sticky; bottom: 0; margin-top: auto; padding: 14px 0 18px; background: linear-gradient(to bottom, rgba(249, 250, 249, 0), #f9faf9 22%); border-top: 1px solid var(--line); }
+.auditToggle { min-height: 30px; padding: 0 9px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line-strong); border-radius: 6px; background: white; color: #4d5851; font-size: 10px; font-weight: 700; }
+.auditToggle:hover:not(:disabled) { border-color: #9ba59e; color: var(--ink); }
+.auditToggle svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform .15s ease; }
+.auditToggle svg.flip { transform: rotate(180deg); }
