@@ -9,6 +9,8 @@ const root = new URL("../", import.meta.url);
 
 test("presents the complete AP exception workflow", async () => {
   const dashboard = await readFile(new URL("app/APWorkbench.tsx", root), "utf8");
+  assert.match(dashboard, /Reset the demo\?/);
+  assert.match(dashboard, /Retiring a bill cannot be undone/);
   for (const label of [
     "Bills to review", "Verified financial facts", "Bill pipeline",
     "Resolve possible duplicate", "Resolve amount change", "Resolve beneficiary",
@@ -200,4 +202,19 @@ test("an inbox message is filed only by the bill it actually produced", async ()
   // The bill records which message created it, and only an open bill counts as filed.
   assert.match(route, /AP-INTAKE-\$\{parsed\.data\.messageId\.replace/);
   assert.match(route, /This message was already filed as/);
+});
+
+test("resetting the demo clears saved decisions and retires only demo bills", async () => {
+  const [route, resolutions, beneficiaryResolutions] = await Promise.all([
+    readFile(new URL("app/api/ap/route.ts", root), "utf8"),
+    readFile(new URL("lib/ap-resolutions.ts", root), "utf8"),
+    readFile(new URL("lib/ap-beneficiary-resolutions.ts", root), "utf8"),
+  ]);
+  assert.match(resolutions, /DELETE FROM ap_resolutions/);
+  assert.match(beneficiaryResolutions, /DELETE FROM ap_beneficiary_resolutions/);
+  // Only bills this app created may be retired, and only while still open.
+  assert.match(route, /externalId\.startsWith\("AP-DEMO-"\) \|\| externalId\.startsWith\("AP-INTAKE-"\)/);
+  assert.match(route, /isDemoBill && OPEN_STATUSES\.has/);
+  // A retired scenario has to be re-creatable, so current bills get a fresh external id.
+  assert.match(route, /spec\.history \? spec\.externalId : `\$\{spec\.externalId\}-\$\{Date\.now\(\)\}`/);
 });

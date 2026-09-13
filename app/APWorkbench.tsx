@@ -208,7 +208,7 @@ Due Date: 2026-10-15
 Thanks,
 Northstar Cloud Billing`;
 
-type ApAction = "validate" | "discard_intake_bill" | "confirm_duplicate" | "override_duplicate" | "request_information" | "approve_variance" | "request_amount_explanation" | "dispute_bill" | "match_beneficiary" | "request_beneficiary_setup" | "incorrect_vendor" | "clear_resolution" | "clear_beneficiary_resolution";
+type ApAction = "reset_demo" | "validate" | "discard_intake_bill" | "confirm_duplicate" | "override_duplicate" | "request_information" | "approve_variance" | "request_amount_explanation" | "dispute_bill" | "match_beneficiary" | "request_beneficiary_setup" | "incorrect_vendor" | "clear_resolution" | "clear_beneficiary_resolution";
 
 type AnalysisResult = {
   action: "ANALYZED";
@@ -263,6 +263,7 @@ const operationLabels: Record<LoggedApiCall["operation"], string> = {
 };
 
 const apiOperationByAction: Record<ApAction, LoggedApiCall["operation"]> = {
+  reset_demo: "SEED",
   validate: "VALIDATE",
   discard_intake_bill: "INTAKE",
   confirm_duplicate: "RESOLVE",
@@ -558,6 +559,7 @@ export default function APWorkbench() {
   const [openMessageId, setOpenMessageId] = useState<string | null>(null);
   const [pasteMode, setPasteMode] = useState(false);
   const [auditOpen, setAuditOpen] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
   const [assistantQuestion, setAssistantQuestion] = useState("");
   const [assistantMessages, setAssistantMessages] = useState<AssistantMessage[]>([]);
   const [assistantLoading, setAssistantLoading] = useState(false);
@@ -620,6 +622,7 @@ export default function APWorkbench() {
 
   async function post(action: ApAction, billId?: string, extra: { note?: string; matchingBillId?: string; beneficiaryId?: string } = {}) {
     const labels = {
+      reset_demo: "Resetting the demo…",
       validate: "Validating payout with Airwallex…",
       discard_intake_bill: "Withdrawing the bill…",
       confirm_duplicate: "Saving duplicate decision…",
@@ -646,7 +649,19 @@ export default function APWorkbench() {
       const body = await response.json();
       setApiActivity((current) => [...current, ...tagApiCalls(body.apiCalls || [], apiOperationByAction[action])].slice(-60));
       if (!response.ok) throw new Error(body.error || "Action failed");
-      if (action === "validate") {
+      if (action === "reset_demo") {
+        setAssistantMessages([]);
+        setNotice(body.message);
+        setAnalysis(null);
+        setPayout(null);
+        setTriageAnalyses({});
+        setIntakeDraft(null);
+        setConfirmed(null);
+        setSourceDoc(null);
+        setInbox(null);
+        setStage("REVIEW");
+        await refresh();
+      } else if (action === "validate") {
         setPayout(body);
         setStage("DECISION");
       } else {
@@ -915,6 +930,9 @@ export default function APWorkbench() {
                 ? "Every check passed and the decision is on the record. Money has not moved."
                 : "AI reviews incoming bills, explains exceptions, and recommends the safest next step."}</p>
           </div>
+          <div className="headerTools">
+            <button className="dangerGhostButton" type="button" disabled={Boolean(loading)} onClick={() => setConfirmReset(true)}>Reset demo</button>
+          </div>
         </header>
 
         <nav className="flowRail" aria-label="Bill pipeline">
@@ -1109,6 +1127,19 @@ export default function APWorkbench() {
               )}
           </div>
         </section>
+        )}
+
+        {confirmReset && (
+          <div className="confirmBar" role="alertdialog" aria-label="Confirm demo reset">
+            <div>
+              <strong>Reset the demo?</strong>
+              <p>Clears every saved exception decision, marks the open demo and intake bills paid in Airwallex, and lays the scenarios out again. Retiring a bill cannot be undone.</p>
+            </div>
+            <div className="confirmActions">
+              <button type="button" className="secondaryButton" onClick={() => setConfirmReset(false)}>Cancel</button>
+              <button type="button" className="dangerButton" disabled={Boolean(loading)} onClick={() => { setConfirmReset(false); post("reset_demo"); }}>Reset demo</button>
+            </div>
+          </div>
         )}
 
         {loading && <div className="inlineMessage"><span className="loader" />{loading}</div>}

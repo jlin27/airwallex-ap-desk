@@ -83,3 +83,10 @@ export async function clearApBeneficiaryResolution(billId: string) {
   await ensureTable();
   await env.DB.prepare("DELETE FROM ap_beneficiary_resolutions WHERE bill_id = ?").bind(billId).run();
 }
+
+/** Used by the demo reset. Drops every saved beneficiary decision. */
+export async function clearAllApBeneficiaryResolutions() {
+  await ensureTable();
+  const result = await env.DB.prepare("DELETE FROM ap_beneficiary_resolutions").run();
+  return Number(result.meta?.changes || 0);
+}

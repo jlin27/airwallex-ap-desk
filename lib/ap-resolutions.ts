@@ -79,3 +79,10 @@ export async function clearApResolution(billId: string) {
   await ensureResolutionTable();
   await env.DB.prepare("DELETE FROM ap_resolutions WHERE bill_id = ?").bind(billId).run();
 }
+
+/** Used by the demo reset. Drops every saved exception decision. */
+export async function clearAllApResolutions() {
+  await ensureResolutionTable();
+  const result = await env.DB.prepare("DELETE FROM ap_resolutions").run();
+  return Number(result.meta?.changes || 0);
+}

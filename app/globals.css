@@ -524,3 +524,12 @@ button.flowStep:hover:not(:disabled) strong { color: var(--ink); }
 .auditToggle:hover:not(:disabled) { border-color: #9ba59e; color: var(--ink); }
 .auditToggle svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform .15s ease; }
 .auditToggle svg.flip { transform: rotate(180deg); }
+.headerTools { display: flex; align-items: center; gap: 8px; }
+.dangerGhostButton { min-height: 38px; padding: 0 13px; display: inline-flex; align-items: center; border: 1px solid #e0b8b3; border-radius: 7px; background: white; color: var(--red); font-size: 12px; font-weight: 700; }
+.dangerGhostButton:hover:not(:disabled) { border-color: #c98d84; }
+.confirmBar { margin-bottom: 16px; padding: 15px 17px; display: flex; align-items: center; justify-content: space-between; gap: 22px; border: 1px solid #e1b5af; border-radius: 8px; background: var(--red-soft); }
+.confirmBar strong { display: block; color: var(--red); font-size: 13px; }
+.confirmBar p { margin: 6px 0 0; max-width: 74ch; color: #8f4238; font-size: 11px; line-height: 1.55; }
+.confirmActions { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; }
+.dangerButton { min-height: 38px; padding: 0 14px; display: inline-flex; align-items: center; border: 1px solid var(--red); border-radius: 7px; background: var(--red); color: white; font-size: 12px; font-weight: 700; }
+.dangerButton:hover:not(:disabled) { background: #96362c; border-color: #96362c; }
