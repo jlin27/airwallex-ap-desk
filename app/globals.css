@@ -58,8 +58,6 @@ h1, h2, h3, p { margin-top: 0; }
 .apHeader > div > p:last-child { margin-bottom: 0; color: var(--muted); font-size: 14px; }
 .secondaryButton, .setupBar button { min-height: 38px; padding: 0 13px; border: 1px solid var(--line-strong); border-radius: 7px; background: white; color: var(--ink); font-size: 12px; font-weight: 700; }
 .secondaryButton:hover, .setupBar button:hover { border-color: #9ba59e; }
-.refreshButton { display: inline-flex; align-items: center; gap: 7px; }
-.refreshButton svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 .setupBar { margin: 26px 0 16px; padding: 13px 15px; border: 1px dashed #b9c1bc; border-radius: 8px; background: #ecefec; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .setupBar > div { display: flex; align-items: center; gap: 10px; }
@@ -407,9 +405,6 @@ button.flowStep:hover:not(:disabled) strong { color: var(--ink); }
 .railStatus { margin-left: 16px; display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 10px; font-weight: 650; white-space: nowrap; }
 .railStatus em { padding: 4px 6px; border-radius: 4px; background: #ecefed; color: #6e7772; font: 700 8px var(--font-geist-mono), monospace; font-style: normal; text-transform: uppercase; }
 .railStatus em.live { background: var(--blue-soft); color: var(--blue); }
-.headerTools { display: flex; align-items: center; gap: 8px; }
-.ghostButton { min-height: 38px; padding: 0 13px; display: inline-flex; align-items: center; border: 1px solid var(--line-strong); border-radius: 7px; background: white; color: var(--ink); font-size: 12px; font-weight: 700; }
-.ghostButton:hover:not(:disabled) { border-color: #9ba59e; }
 
 /* Decision record — the ending of the pipeline */
 .decisionStage { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 18px; }
@@ -496,14 +491,6 @@ button.flowStep:hover:not(:disabled) strong { color: var(--ink); }
 .filedTag { margin-top: 6px; display: inline-block; padding: 3px 6px; border-radius: 4px; background: var(--green-soft); color: var(--green); font: 800 8px var(--font-geist-mono), monospace; font-style: normal; text-transform: uppercase; }
 .inboxEmpty { margin: 0; padding: 30px 17px; color: var(--muted); font-size: 11px; text-align: center; }
 .inboxNote { margin: 0; padding: 12px 17px; border-top: 1px solid var(--line); background: var(--panel); color: #929a95; font-size: 10px; line-height: 1.55; }
-.dangerGhostButton { min-height: 38px; padding: 0 13px; display: inline-flex; align-items: center; border: 1px solid #e0b8b3; border-radius: 7px; background: white; color: var(--red); font-size: 12px; font-weight: 700; }
-.dangerGhostButton:hover:not(:disabled) { border-color: #c98d84; }
-.confirmBar { margin-bottom: 16px; padding: 15px 17px; display: flex; align-items: center; justify-content: space-between; gap: 22px; border: 1px solid #e1b5af; border-radius: 8px; background: var(--red-soft); }
-.confirmBar strong { display: block; color: var(--red); font-size: 13px; }
-.confirmBar p { margin: 6px 0 0; max-width: 74ch; color: #8f4238; font-size: 11px; line-height: 1.55; }
-.confirmActions { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; }
-.dangerButton { min-height: 38px; padding: 0 14px; display: inline-flex; align-items: center; border: 1px solid var(--red); border-radius: 7px; background: var(--red); color: white; font-size: 12px; font-weight: 700; }
-.dangerButton:hover:not(:disabled) { background: #96362c; border-color: #96362c; }
 .filedNotice { margin-top: 16px; padding: 13px 15px; border: 1px solid #b3d7c2; border-radius: 7px; background: var(--green-soft); }
 .filedNotice strong { display: block; color: var(--green); font-size: 11px; }
 .filedNotice p { margin: 6px 0 0; color: #41715a; font-size: 11px; line-height: 1.5; }

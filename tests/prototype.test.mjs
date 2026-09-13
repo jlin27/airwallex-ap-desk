@@ -18,8 +18,6 @@ test("presents the complete AP exception workflow", async () => {
     assert.match(dashboard, new RegExp(label));
   }
   assert.match(dashboard, /You remain in control of payment/);
-  assert.match(dashboard, /Reset the demo\?/);
-  assert.match(dashboard, /Retiring a bill cannot be undone/);
   assert.match(dashboard, /AI reviews incoming bills, explains exceptions/);
   assert.doesNotMatch(dashboard, /questionBox/);
   assert.doesNotMatch(dashboard, /Server verified/);
@@ -141,13 +139,6 @@ test("keeps credentials server-side and validates actions", async () => {
   assert.match(route, /Server guardrails blocked payout validation/);
 });
 
-test("can seed three Sandbox-backed demo scenarios", async () => {
-  const route = await readFile(new URL("app/api/ap/route.ts", root), "utf8");
-  assert.match(route, /AP-DEMO-PAYROLL-CURRENT/);
-  assert.match(route, /AP-DEMO-CLOUD-CURRENT/);
-  assert.match(route, /AP-DEMO-STUDIO-DUPLICATE/);
-  assert.match(route, /historyMarkedPaid/);
-});
 
 test("persists auditable exception decisions without moving money", async () => {
   const [route, resolutions, beneficiaryResolutions, hosting] = await Promise.all([
@@ -186,25 +177,11 @@ test("only matches a beneficiary returned by live Airwallex data", async () => {
 
 
 
-test("resetting the demo clears saved decisions and retires only demo bills", async () => {
-  const [route, resolutions, beneficiaryResolutions] = await Promise.all([
-    readFile(new URL("app/api/ap/route.ts", root), "utf8"),
-    readFile(new URL("lib/ap-resolutions.ts", root), "utf8"),
-    readFile(new URL("lib/ap-beneficiary-resolutions.ts", root), "utf8"),
-  ]);
-  assert.match(resolutions, /DELETE FROM ap_resolutions/);
-  assert.match(beneficiaryResolutions, /DELETE FROM ap_beneficiary_resolutions/);
-  // Only bills this app created may be retired, and only while still open.
-  assert.match(route, /externalId\.startsWith\("AP-DEMO-"\) \|\| externalId\.startsWith\("AP-INTAKE-"\)/);
-  assert.match(route, /isDemoBill && OPEN_STATUSES\.has/);
-  // A retired scenario has to be re-creatable, so current bills get a fresh external id.
-  assert.match(route, /spec\.history \? spec\.externalId : `\$\{spec\.externalId\}-\$\{Date\.now\(\)\}`/);
-});
 
 test("retired app-created bills are not treated as vendor history", async () => {
   const route = await readFile(new URL("app/api/ap/route.ts", root), "utf8");
-  // A reset lays down a replacement with the same vendor, amount and date as the bill it
-  // retired, which every duplicate signal would otherwise read as a duplicate.
+  // Bills left behind by earlier demo generations share a vendor, amount and date with
+  // the ones that replaced them, which every duplicate signal would read as a duplicate.
   assert.match(route, /const supersededIds = new Set\(/);
   // The marker is the trailing timestamp, so every regenerated scenario is covered — not
   // just the ones whose id happens to end in CURRENT. History bills carry no timestamp

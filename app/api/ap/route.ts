@@ -12,7 +12,6 @@ import {
   AirwallexApiError,
   authenticateAirwallex,
   createBill,
-  createVendor,
   getBill,
   getCurrentAccount,
   listBalances,
@@ -35,14 +34,12 @@ import {
 } from "../../../lib/ap-intake";
 import { findInboxMessage, listInboxMessages } from "../../../lib/ap-inbox";
 import {
-  clearAllApResolutions,
   clearApResolution,
   listApResolutions,
   saveApResolution,
   type ApResolution,
 } from "../../../lib/ap-resolutions";
 import {
-  clearAllApBeneficiaryResolutions,
   clearApBeneficiaryResolution,
   listApBeneficiaryResolutions,
   saveApBeneficiaryResolution,
@@ -60,7 +57,7 @@ const confirmedIntakeSchema = z.object({
 }).strict();
 
 const requestSchema = z.object({
-  action: z.enum(["seed", "reset_demo", "triage", "assistant", "validate", "inbox", "intake", "create_bill_from_intake", "discard_intake_bill", "confirm_duplicate", "override_duplicate", "request_information", "approve_variance", "request_amount_explanation", "dispute_bill", "match_beneficiary", "request_beneficiary_setup", "incorrect_vendor", "clear_resolution", "clear_beneficiary_resolution"]),
+  action: z.enum(["triage", "assistant", "validate", "inbox", "intake", "create_bill_from_intake", "discard_intake_bill", "confirm_duplicate", "override_duplicate", "request_information", "approve_variance", "request_amount_explanation", "dispute_bill", "match_beneficiary", "request_beneficiary_setup", "incorrect_vendor", "clear_resolution", "clear_beneficiary_resolution"]),
   billId: z.string().uuid().optional(),
   question: z.string().trim().min(2).max(1000).optional(),
   note: z.string().trim().max(1000).optional(),
@@ -514,107 +511,6 @@ function dateFromToday(offsetDays: number) {
   return value.toISOString().slice(0, 10);
 }
 
-async function seedDemoData(token: string, apiCalls?: AirwallexApiTrace) {
-  const [account, existingVendors, existingBills, beneficiaries] = await Promise.all([
-    getCurrentAccount(token, apiCalls),
-    listVendors(token, apiCalls),
-    listBills(token, apiCalls),
-    listBeneficiaries(token, apiCalls),
-  ]);
-  const legalEntityId = account.account_details?.legal_entity_id;
-  if (!legalEntityId) throw new Error("Airwallex did not return a legal entity ID for bill setup");
-
-  // Any beneficiary carrying its own transfer method and account currency will do —
-  // this no longer depends on a transfer having been sent to it in the past.
-  const payrollRoute = beneficiaries
-    .map(readPayoutRoute)
-    .find((route): route is PayoutRoute => Boolean(route && route.transferMethods.length && route.payoutCurrency));
-  if (!payrollRoute) throw new Error("No saved beneficiary with a usable payout route is available for the routine scenario");
-
-  const vendorSpecs = [
-    { externalId: "AP-DEMO-PAYROLL-VENDOR", name: payrollRoute.displayName },
-    { externalId: "AP-DEMO-CLOUD-VENDOR", name: "Northstar Cloud" },
-    { externalId: "AP-DEMO-STUDIO-VENDOR", name: "Studio North" },
-  ];
-  const vendorIds = new Map<string, string>();
-  let vendorsCreated = 0;
-  for (const spec of vendorSpecs) {
-    let vendor = existingVendors.find((item) => item.external_id === spec.externalId);
-    if (!vendor) {
-      vendor = await createVendor(token, {
-        request_id: randomUUID(),
-        external_id: spec.externalId,
-        name: spec.name,
-        legal_entity_ids: [legalEntityId],
-        status: "ACTIVE",
-        sync_status: "NOT_SYNCED",
-      }, apiCalls);
-      vendorsCreated += 1;
-    }
-    vendorIds.set(spec.externalId, String(vendor.id));
-  }
-
-  const payrollCurrency = payrollRoute.payoutCurrency as string;
-  const generation = 1 + existingBills.filter((item) => String(item.external_id || "").startsWith("AP-DEMO-PAYROLL-CURRENT")).length;
-  const generationSuffix = generation > 1 ? `-${generation}` : "";
-  const billSpecs = [
-    { externalId: "AP-DEMO-PAYROLL-HIST-01", vendorKey: "AP-DEMO-PAYROLL-VENDOR", invoice: "PAY-0701", amount: 100, currency: payrollCurrency, issue: -60, due: -45, description: "Monthly payroll processing", history: true },
-    { externalId: "AP-DEMO-PAYROLL-HIST-02", vendorKey: "AP-DEMO-PAYROLL-VENDOR", invoice: "PAY-0801", amount: 100, currency: payrollCurrency, issue: -30, due: -15, description: "Monthly payroll processing", history: true },
-    { externalId: "AP-DEMO-PAYROLL-CURRENT", vendorKey: "AP-DEMO-PAYROLL-VENDOR", invoice: "PAY-0901", amount: 100, currency: payrollCurrency, issue: 0, due: 10, description: "Monthly payroll processing", history: false },
-    { externalId: "AP-DEMO-CLOUD-HIST", vendorKey: "AP-DEMO-CLOUD-VENDOR", invoice: "NC-0801", amount: 100, currency: "USD", issue: -30, due: -15, description: "Cloud infrastructure subscription", history: true },
-    { externalId: "AP-DEMO-CLOUD-CURRENT", vendorKey: "AP-DEMO-CLOUD-VENDOR", invoice: "NC-0901", amount: 138, currency: "USD", issue: 0, due: 12, description: "Cloud infrastructure subscription", history: false },
-    { externalId: "AP-DEMO-STUDIO-ORIGINAL", vendorKey: "AP-DEMO-STUDIO-VENDOR", invoice: "SN-552", amount: 500, currency: "USD", issue: -4, due: -1, description: "Product design services", history: true },
-    { externalId: "AP-DEMO-STUDIO-DUPLICATE", vendorKey: "AP-DEMO-STUDIO-VENDOR", invoice: "SN-552", amount: 500, currency: "USD", issue: 0, due: 14, description: "Product design services", history: false, keepInvoiceNumber: true },
-  ];
-
-  let billsCreated = 0;
-  let historyMarkedPaid = 0;
-  const warnings: string[] = [];
-  for (const spec of billSpecs) {
-    // History bills are matched exactly: they are meant to stay paid and be reused.
-    // Current bills are matched only while still OPEN, so a reset that retires them
-    // lets the next seed create a fresh one under a new external id.
-    const bill0 = spec.history
-      ? existingBills.find((item) => item.external_id === spec.externalId)
-      : existingBills.find((item) => String(item.external_id || "").startsWith(spec.externalId) && OPEN_STATUSES.has(String(item.status || "")));
-    let bill = bill0;
-    if (!bill) {
-      bill = await createBill(token, {
-        billing_currency: spec.currency,
-        due_date: dateFromToday(spec.due),
-        external_id: spec.history ? spec.externalId : `${spec.externalId}-${Date.now()}`,
-        invoice_number: spec.history || "keepInvoiceNumber" in spec ? spec.invoice : `${spec.invoice}${generationSuffix}`,
-        issued_date: dateFromToday(spec.issue),
-        legal_entity_id: legalEntityId,
-        line_items: [{ description: spec.description, quantity: "1", unit_price: spec.amount.toFixed(2) }],
-        request_id: randomUUID(),
-        sync_status: "NOT_SYNCED",
-        tax_status: "TAX_EXCLUSIVE",
-        vendor_id: vendorIds.get(spec.vendorKey),
-      }, apiCalls);
-      billsCreated += 1;
-    }
-    if (spec.history && !["PAID", "MARKED_AS_PAID"].includes(String(bill.status))) {
-      try {
-        await markBillPaid(token, String(bill.id), apiCalls);
-        historyMarkedPaid += 1;
-      } catch (error) {
-        warnings.push(error instanceof Error ? error.message : `Could not mark ${spec.externalId} as paid`);
-      }
-    }
-  }
-
-  return {
-    message: billsCreated || vendorsCreated
-      ? "Airwallex demo bills are ready"
-      : "Airwallex demo bills already exist",
-    vendorsCreated,
-    billsCreated,
-    historyMarkedPaid,
-    warnings,
-  };
-}
-
 function errorResponse(error: unknown, apiCalls: AirwallexApiTrace = []) {
   if (error instanceof AirwallexApiError) {
     return NextResponse.json({ error: error.message, code: error.code, details: error.details, apiCalls }, { status: error.status });
@@ -646,49 +542,6 @@ export async function POST(request: NextRequest) {
       if (!cachedState) cachedState = await loadCases(token, apiCalls);
       return cachedState;
     };
-
-    if (parsed.data.action === "reset_demo") {
-      // Return the sandbox to the state a fresh demo starts from: forget every saved
-      // decision, retire the open demo and intake bills, then lay the scenarios out again.
-      const [resolutionsCleared, beneficiaryResolutionsCleared] = await Promise.all([
-        clearAllApResolutions(),
-        clearAllApBeneficiaryResolutions(),
-      ]);
-
-      const bills = await listBills(token, apiCalls);
-      const retirable = bills.filter((bill) => {
-        const externalId = String(bill.external_id || "");
-        const isDemoBill = externalId.startsWith("AP-DEMO-") || externalId.startsWith("AP-INTAKE-");
-        return isDemoBill && OPEN_STATUSES.has(String(bill.status || ""));
-      });
-
-      const warnings: string[] = [];
-      let billsRetired = 0;
-      for (const bill of retirable) {
-        try {
-          await markBillPaid(token, String(bill.id), apiCalls);
-          billsRetired += 1;
-        } catch (error) {
-          warnings.push(error instanceof Error ? error.message : `Could not retire ${bill.invoice_number}`);
-        }
-      }
-
-      const seeded = await seedDemoData(token, apiCalls);
-      return NextResponse.json({
-        action: "DEMO_RESET",
-        resolutionsCleared,
-        beneficiaryResolutionsCleared,
-        billsRetired,
-        billsCreated: seeded.billsCreated,
-        message: `Demo reset: ${billsRetired} open bill${billsRetired === 1 ? "" : "s"} retired, ${resolutionsCleared + beneficiaryResolutionsCleared} saved decision${resolutionsCleared + beneficiaryResolutionsCleared === 1 ? "" : "s"} cleared, ${seeded.billsCreated} fresh bill${seeded.billsCreated === 1 ? "" : "s"} created.`,
-        warnings: [...warnings, ...seeded.warnings],
-        apiCalls,
-      });
-    }
-
-    if (parsed.data.action === "seed") {
-      return NextResponse.json({ ...await seedDemoData(token, apiCalls), apiCalls });
-    }
 
     if (parsed.data.action === "inbox") {
       // Filed means THIS message produced a bill that is still open — not merely that some

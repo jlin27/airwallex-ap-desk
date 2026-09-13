@@ -428,6 +428,13 @@ export async function answerApQuestion(facts: ApFacts, question: string): Promis
       beneficiaryMatched: Boolean(facts.beneficiaryId),
       transferRouteAvailable: facts.transferRouteAvailable,
       fundingStatus: fundingStatusForModel(facts),
+      // How the payout is funded, so "which wallet pays this?" is answerable. The raw
+      // wallet balance stays out — the model gets the converted amount, not the treasury.
+      payoutCurrency: facts.payoutCurrency,
+      fundingCurrency: facts.sourceCurrency,
+      amountInFundingCurrency: facts.requiredSourceAmount,
+      fxRate: facts.fxRate,
+      transferMethod: facts.transferMethod,
       serverRecommendation: recommendation,
       requiresHuman: recommendation !== "READY_TO_VALIDATE",
     };

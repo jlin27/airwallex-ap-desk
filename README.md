@@ -73,17 +73,18 @@ keeps everything working — the server guardrails are identical either way.
 
 ## Demo
 
-1. **Demo data** in the header seeds the scenarios into the Sandbox
-2. **Intake** — open an inbox message; watch the extraction and the server checks
+The app reads and reviews what is already in the Sandbox; it has no seed or reset control.
+
+1. **Intake** — open an inbox message; watch the extraction and the server checks
    - `BPL-2291` is from a vendor that doesn't exist: blocked before anything is written
    - `NC-1150` carries instructions aimed at the agent
-3. **Review** — duplicate and amount-change cases can't advance
-4. **Resolve** — approve the variance with a reason; see the record that gets written
-5. **Decision** — validate the payroll payout; `VALIDATED`, funded across currencies via
+2. **Review** — duplicate and amount-change cases can't advance
+3. **Resolve** — approve the variance with a reason; see the record that gets written
+4. **Decision** — validate the payroll payout; `VALIDATED`, funded across currencies via
    live FX, and an audit trail. No transfer is created.
 
-**Reset demo** returns the Sandbox to the starting state: clears saved decisions, retires
-the demo and intake bills, and lays the scenarios out again.
+A bill created by intake can be withdrawn from its detail pane, which returns its inbox
+message to unfiled. Nothing else the app does can be undone from the UI.
 
 ## Safety boundary
 

@@ -208,7 +208,7 @@ Due Date: 2026-10-15
 Thanks,
 Northstar Cloud Billing`;
 
-type ApAction = "seed" | "reset_demo" | "validate" | "discard_intake_bill" | "confirm_duplicate" | "override_duplicate" | "request_information" | "approve_variance" | "request_amount_explanation" | "dispute_bill" | "match_beneficiary" | "request_beneficiary_setup" | "incorrect_vendor" | "clear_resolution" | "clear_beneficiary_resolution";
+type ApAction = "validate" | "discard_intake_bill" | "confirm_duplicate" | "override_duplicate" | "request_information" | "approve_variance" | "request_amount_explanation" | "dispute_bill" | "match_beneficiary" | "request_beneficiary_setup" | "incorrect_vendor" | "clear_resolution" | "clear_beneficiary_resolution";
 
 type AnalysisResult = {
   action: "ANALYZED";
@@ -263,8 +263,6 @@ const operationLabels: Record<LoggedApiCall["operation"], string> = {
 };
 
 const apiOperationByAction: Record<ApAction, LoggedApiCall["operation"]> = {
-  seed: "SEED",
-  reset_demo: "SEED",
   validate: "VALIDATE",
   discard_intake_bill: "INTAKE",
   confirm_duplicate: "RESOLVE",
@@ -402,6 +400,88 @@ function highlightParts(body: string, flagged: string | null) {
   ].filter((part) => part.text.length > 0);
 }
 
+/**
+ * The three shortcuts and the placeholder have to match the decision on screen:
+ * "Why was this flagged?" is nonsense on a bill that passed every check.
+ */
+function assistantPromptsFor(code: RecommendationCode | undefined) {
+  switch (code) {
+    case "READY_TO_VALIDATE":
+      return {
+        placeholder: "Example: Anything about this vendor I should know before validating?",
+        chips: [
+          { label: "What was checked?", question: "Which checks did this bill pass, and what did each one verify?" },
+          { label: "How is it funded?", question: "Which wallet funds this payout, and is any currency conversion involved?" },
+          { label: "What does validating do?", question: "What happens when I validate this payout, and what does it not do?" },
+        ],
+      };
+    case "REVIEW_DUPLICATE":
+      return {
+        placeholder: "Example: The vendor says the first invoice was cancelled. Is that enough?",
+        chips: [
+          { label: "Why was this flagged?", question: "Why was this bill flagged as a possible duplicate?" },
+          { label: "How do the two compare?", question: "How does this bill differ from the one it matched?" },
+          { label: "Draft a request", question: "Draft a request asking the submitter to confirm whether this is a resubmission." },
+        ],
+      };
+    case "MISSING_BENEFICIARY":
+      return {
+        placeholder: "Example: Vendor Ops say the beneficiary was set up last week. Is that enough?",
+        chips: [
+          { label: "Why is it blocked?", question: "Why can this bill not be paid yet?" },
+          { label: "What would unblock it?", question: "What exactly is needed to establish a payout route for this vendor?" },
+          { label: "Draft a request", question: "Draft a request asking Vendor Operations to complete verified beneficiary setup." },
+        ],
+      };
+    case "BENEFICIARY_CURRENCY_MISMATCH":
+      return {
+        placeholder: "Example: The vendor says they now invoice in USD. Is that enough?",
+        chips: [
+          { label: "What is the mismatch?", question: "Which currency is this bill in, and which currency is the beneficiary paid in?" },
+          { label: "What would resolve it?", question: "What would resolve the currency mismatch on this bill?" },
+          { label: "Draft a request", question: "Draft a request asking the vendor to confirm which currency they should be paid in." },
+        ],
+      };
+    case "INSUFFICIENT_FUNDS":
+      return {
+        placeholder: "Example: Treasury say a top-up lands tomorrow. Is that enough?",
+        chips: [
+          { label: "How much is short?", question: "How much is needed, in which currency, and what is available?" },
+          { label: "Could another wallet fund it?", question: "Could any other wallet fund this payout, and at what rate?" },
+          { label: "Draft a request", question: "Draft a request asking Treasury to fund the wallet for this payout." },
+        ],
+      };
+    case "REQUEST_INFORMATION":
+      return {
+        placeholder: "Example: The submitter says the PO number is on the attachment. Is that enough?",
+        chips: [
+          { label: "What is missing?", question: "What information is missing from this bill?" },
+          { label: "Why does it matter?", question: "Why is the missing information needed before payment?" },
+          { label: "Draft a request", question: "Draft a request asking the submitter for the missing invoice information." },
+        ],
+      };
+    case "REVIEW_AMOUNT_CHANGE":
+      return {
+        placeholder: "Example: The submitter says usage increased after launch. Is that enough?",
+        chips: [
+          { label: "Why was this flagged?", question: "Why was this bill flagged for an amount change?" },
+          { label: "What evidence would clear it?", question: "What evidence would clear this amount exception?" },
+          { label: "Draft a request", question: "Draft a request asking the submitter to explain the increase." },
+        ],
+      };
+    default:
+      // A recommendation with no tailored prompts still gets questions that fit any bill.
+      return {
+        placeholder: "Example: Is there anything here I should check before deciding?",
+        chips: [
+          { label: "What was checked?", question: "Which checks ran on this bill, and what did each one find?" },
+          { label: "What happens next?", question: "What is the safest next step for this bill, and why?" },
+          { label: "Draft a request", question: "Draft a request for the submitter about this bill." },
+        ],
+      };
+  }
+}
+
 function relativeTime(value: string) {
   const parsed = Date.parse(value);
   if (Number.isNaN(parsed)) return "";
@@ -477,7 +557,6 @@ export default function APWorkbench() {
   const [sourceDoc, setSourceDoc] = useState<{ attachment: string | null; fromName: string | null; body: string } | null>(null);
   const [openMessageId, setOpenMessageId] = useState<string | null>(null);
   const [pasteMode, setPasteMode] = useState(false);
-  const [confirmReset, setConfirmReset] = useState(false);
   const [auditOpen, setAuditOpen] = useState(false);
   const [assistantQuestion, setAssistantQuestion] = useState("");
   const [assistantMessages, setAssistantMessages] = useState<AssistantMessage[]>([]);
@@ -541,8 +620,6 @@ export default function APWorkbench() {
 
   async function post(action: ApAction, billId?: string, extra: { note?: string; matchingBillId?: string; beneficiaryId?: string } = {}) {
     const labels = {
-      seed: "Creating demo bills in Airwallex…",
-      reset_demo: "Resetting the demo…",
       validate: "Validating payout with Airwallex…",
       discard_intake_bill: "Withdrawing the bill…",
       confirm_duplicate: "Saving duplicate decision…",
@@ -569,11 +646,7 @@ export default function APWorkbench() {
       const body = await response.json();
       setApiActivity((current) => [...current, ...tagApiCalls(body.apiCalls || [], apiOperationByAction[action])].slice(-60));
       if (!response.ok) throw new Error(body.error || "Action failed");
-      if (action === "seed") {
-        setAssistantMessages([]);
-        setNotice(body.message);
-        await refresh();
-      } else if (action === "validate") {
+      if (action === "validate") {
         setPayout(body);
         setStage("DECISION");
       } else {
@@ -729,6 +802,7 @@ export default function APWorkbench() {
   }, [workspace, filter]);
 
   const selected = workspace?.cases.find((item) => item.id === selectedId) || filteredCases[0] || null;
+  const assistantPrompts = assistantPromptsFor(selected?.serverRecommendation.recommendation);
   const currentAnalysis = analysis?.billId === selected?.id
     ? analysis
     : selected ? triageAnalyses[selected.id] || null : null;
@@ -840,14 +914,6 @@ export default function APWorkbench() {
               : stage === "DECISION"
                 ? "Every check passed and the decision is on the record. Money has not moved."
                 : "AI reviews incoming bills, explains exceptions, and recommends the safest next step."}</p>
-          </div>
-          <div className="headerTools">
-            <button className="ghostButton" type="button" disabled={Boolean(loading)} onClick={() => post("seed")} title="Create a routine bill, a duplicate, and an amount-increase case using real Sandbox bill records">Demo data</button>
-            <button className="secondaryButton refreshButton" disabled={Boolean(loading)} onClick={() => refresh().catch((cause) => setError(cause.message))}>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5" /></svg>
-              Refresh
-            </button>
-            <button className="dangerGhostButton" type="button" disabled={Boolean(loading)} onClick={() => setConfirmReset(true)}>Reset demo</button>
           </div>
         </header>
 
@@ -1043,19 +1109,6 @@ export default function APWorkbench() {
               )}
           </div>
         </section>
-        )}
-
-        {confirmReset && (
-          <div className="confirmBar" role="alertdialog" aria-label="Confirm demo reset">
-            <div>
-              <strong>Reset the demo?</strong>
-              <p>Clears every saved exception decision, marks the open demo and intake bills paid in Airwallex, and lays the scenarios out again. Retiring a bill cannot be undone.</p>
-            </div>
-            <div className="confirmActions">
-              <button type="button" className="secondaryButton" onClick={() => setConfirmReset(false)}>Cancel</button>
-              <button type="button" className="dangerButton" disabled={Boolean(loading)} onClick={() => { setConfirmReset(false); post("reset_demo"); }}>Reset demo</button>
-            </div>
-          </div>
         )}
 
         {loading && <div className="inlineMessage"><span className="loader" />{loading}</div>}
@@ -1384,9 +1437,9 @@ export default function APWorkbench() {
                   <form className="assistantComposer" onSubmit={(event) => { event.preventDefault(); askAssistant(assistantQuestion); }}>
                     <p className="assistantLead">Ask the agent about {selected?.vendor || "this bill"}</p>
                     <div className="assistantPrompts" aria-label="Suggested questions">
-                      <button type="button" disabled={assistantLoading} onClick={() => askAssistant("Why was this bill flagged?", "Question")}>Why was this flagged?</button>
-                      <button type="button" disabled={assistantLoading} onClick={() => askAssistant("What evidence would clear this exception?", "Question")}>What evidence would clear it?</button>
-                      <button type="button" disabled={assistantLoading} onClick={() => askAssistant("Draft a request for the submitter.", "Question")}>Draft a request</button>
+                      {assistantPrompts.chips.map((chip) => (
+                        <button key={chip.label} type="button" disabled={assistantLoading} onClick={() => askAssistant(chip.question, "Question")}>{chip.label}</button>
+                      ))}
                     </div>
                     <label className="visuallyHidden" htmlFor="assistant-question">Ask a question or add context</label>
                     <textarea
@@ -1395,7 +1448,7 @@ export default function APWorkbench() {
                       maxLength={1000}
                       value={assistantQuestion}
                       onChange={(event) => setAssistantQuestion(event.target.value)}
-                      placeholder="Example: The submitter says usage increased after launch. Is that enough?"
+                      placeholder={assistantPrompts.placeholder}
                     />
                     <div><small>Anything entered here is treated as unverified.</small><button className="primaryButton" type="submit" disabled={assistantQuestion.trim().length < 2 || assistantLoading}>Ask assistant</button></div>
                   </form>
