@@ -140,11 +140,6 @@ export async function listBalances(token: string, trace?: AirwallexApiTrace) {
   return (Array.isArray(body) ? body : []) as AirwallexJson[];
 }
 
-export async function listTransfers(token: string, trace?: AirwallexApiTrace) {
-  const body = await airwallexRequest(token, "/api/v1/transfers?page_num=0&page_size=100", {}, trace);
-  return (body.items || []) as AirwallexJson[];
-}
-
 export async function validateTransfer(token: string, payload: AirwallexJson, trace?: AirwallexApiTrace) {
   return airwallexRequest(token, "/api/v1/transfers/validate", {
     method: "POST",

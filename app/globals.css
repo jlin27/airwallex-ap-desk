@@ -534,3 +534,5 @@ h1, h2, h3, p { margin-top: 0; }
 .confirmActions { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; }
 .dangerButton { min-height: 38px; padding: 0 14px; display: inline-flex; align-items: center; border: 1px solid var(--red); border-radius: 7px; background: var(--red); color: white; font-size: 12px; font-weight: 700; }
 .dangerButton:hover:not(:disabled) { background: #96362c; border-color: #96362c; }
+.nextCard code { padding: 1px 4px; border-radius: 3px; background: #eef1ef; color: #4f5953; font: 9px var(--font-geist-mono), monospace; }
+.nextCard strong { color: var(--green); font-weight: 750; }

@@ -1555,8 +1555,9 @@ export default function APWorkbench() {
 
             <div className="sideRail">
               <div className="nextCard">
-                <h3>Releasing payment</h3>
-                <p>Creating the transfer is the only step that moves money, and it is deliberately absent from this prototype. The decision record above is what a person would hand to whoever releases it.</p>
+                <h3>Why the log shows a transfers call</h3>
+                <p>Airwallex has two separate endpoints. <code>POST /transfers/validate</code> &mdash; the one in the log &mdash; checks the beneficiary, route and funding and answers <strong>VALIDATED</strong>. It creates nothing and moves nothing.</p>
+                <p>Money moves on <code>POST /transfers/create</code>, a different call this prototype never makes. The decision record above is what a person would hand to whoever does.</p>
                 <div className="nextActions">
                   <button className="secondaryButton fullWidth" type="button" onClick={() => setStage("REVIEW")}>Return to the queue</button>
                 </div>

@@ -14,7 +14,7 @@ test("presents the complete AP exception workflow", async () => {
   for (const label of [
     "Bills to review", "Verified financial facts", "Bill pipeline",
     "Resolve possible duplicate", "Resolve amount change", "Resolve beneficiary",
-    "Validate payout with Airwallex", "View decision record", "Releasing payment",
+    "Validate payout with Airwallex", "View decision record", "Why the log shows a transfers call",
     "Ask about this bill", "Invoices arriving in AP", "unfiled", "Paste text instead",
   ]) {
     assert.match(dashboard, new RegExp(label));
@@ -217,4 +217,18 @@ test("resetting the demo clears saved decisions and retires only demo bills", as
   assert.match(route, /isDemoBill && OPEN_STATUSES\.has/);
   // A retired scenario has to be re-creatable, so current bills get a fresh external id.
   assert.match(route, /spec\.history \? spec\.externalId : `\$\{spec\.externalId\}-\$\{Date\.now\(\)\}`/);
+});
+
+test("validate and create are distinguished, and only validate is reachable", async () => {
+  const [client, dashboard] = await Promise.all([
+    readFile(new URL("lib/airwallex-ap.ts", root), "utf8"),
+    readFile(new URL("app/APWorkbench.tsx", root), "utf8"),
+  ]);
+  // The only transfers endpoint the app can reach is the dry run.
+  const endpoints = [...client.matchAll(/["'`](\/api\/v1\/transfers[^"'`]*)/g)].map((m) => m[1]);
+  assert.deepEqual(endpoints, ["/api/v1/transfers/validate"]);
+  // And the UI says so where a reader would otherwise misread the log.
+  assert.match(dashboard, /POST \/transfers\/validate/);
+  assert.match(dashboard, /POST \/transfers\/create/);
+  assert.match(dashboard, /never makes/);
 });
