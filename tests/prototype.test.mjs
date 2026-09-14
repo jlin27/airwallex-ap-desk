@@ -26,7 +26,7 @@ test("presents the complete AP exception workflow", async () => {
   assert.doesNotMatch(dashboard, /guardrailBox/);
   assert.doesNotMatch(dashboard, /auditStrip/);
   assert.doesNotMatch(dashboard, /safetyFooter/);
-  for (const queue of ["Needs attention", "Ready", "On hold", "Closed"]) assert.match(dashboard, new RegExp(queue));
+  for (const queue of ["Attention", "Ready", "On hold", "Closed"]) assert.match(dashboard, new RegExp(queue));
   assert.match(dashboard, /duplicateResolution \? \(/);
   assert.match(dashboard, /amountResolution \? \(/);
   assert.match(dashboard, /beneficiaryResolution \? \(/);

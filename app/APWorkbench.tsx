@@ -246,7 +246,7 @@ type QueueFilter = "ALL" | ApQueueStatus;
 
 const queueFilterLabels: Record<QueueFilter, string> = {
   ALL: "All",
-  ATTENTION: "Needs attention",
+  ATTENTION: "Attention",
   READY: "Ready",
   ON_HOLD: "On hold",
   CLOSED: "Closed",
@@ -816,6 +816,17 @@ export default function APWorkbench() {
     return filter === "ALL" ? cases : cases.filter((item) => apQueueStatus(item) === filter);
   }, [workspace, filter]);
 
+  const queueCounts = useMemo(() => {
+    const cases = workspace?.cases || [];
+    return {
+      ALL: cases.length,
+      ATTENTION: cases.filter((item) => apQueueStatus(item) === "ATTENTION").length,
+      READY: cases.filter((item) => apQueueStatus(item) === "READY").length,
+      ON_HOLD: cases.filter((item) => apQueueStatus(item) === "ON_HOLD").length,
+      CLOSED: cases.filter((item) => apQueueStatus(item) === "CLOSED").length,
+    };
+  }, [workspace]);
+
   const selected = workspace?.cases.find((item) => item.id === selectedId) || filteredCases[0] || null;
   const assistantPrompts = assistantPromptsFor(selected?.serverRecommendation.recommendation);
   const currentAnalysis = analysis?.billId === selected?.id
@@ -1147,23 +1158,15 @@ export default function APWorkbench() {
         {notice && <div className="inlineMessage success">{notice}</div>}
 
         {stage === "REVIEW" && (<>
-        <section className="summaryGrid" aria-label="Bill summary">
-          <div><span>Open bills</span><strong>{workspace?.summary.open ?? "—"}</strong><small>From Airwallex</small></div>
-          <div><span>Needs attention</span><strong>{workspace?.summary.needsAttention ?? "—"}</strong><small>Exceptions detected</small></div>
-          <div><span>Ready to validate</span><strong>{workspace?.summary.ready ?? "—"}</strong><small>No blocking facts</small></div>
-          <div><span>Open value</span><strong>{money(workspace?.summary.totalValue || 0)}</strong><small>Across currencies*</small></div>
-        </section>
-
         <div className="workbench" id="bills">
           <section className="billQueue" aria-label="Bill queue">
             <div className="queueHeader">
               <div><p className="eyebrow">Inbox</p><h2>Bills to review</h2></div>
-              <span>{filteredCases.length}</span>
             </div>
             <div className="filterTabs" role="tablist" aria-label="Filter bills">
               {(["ALL", "ATTENTION", "READY", "ON_HOLD", "CLOSED"] as const).map((value) => (
                 <button key={value} className={filter === value ? "active" : ""} onClick={() => setFilter(value)}>
-                  {queueFilterLabels[value]}
+                  {queueFilterLabels[value]} <b>{queueCounts[value]}</b>
                 </button>
               ))}
             </div>
@@ -1614,7 +1617,6 @@ export default function APWorkbench() {
           </div>
           )}
         </section>
-        <p className="currencyNote">* Open value is a simple display total and does not convert currencies.</p>
       </main>
     </div>
   );
