@@ -18,3 +18,8 @@ dist/
 # _shell.css, canvas.json and build.mjs. Regenerate with: node .design/build.mjs
 .design/*.dc.html
 .design/ap-desk-flow.html
+# The palette canvas generates everything but its build script, canvas.json
+# included. Regenerate with: node .design/palette/build.mjs
+.design/palette/*.dc.html
+.design/palette/canvas.json
+.design/palette/ap-desk-palette-directions.html
