@@ -56,6 +56,28 @@ test("attaches the model's reasoning to the check the server decision turns on",
   assert.doesNotMatch(beneficiaryTone, /: "neutral";/);
 });
 
+test("seeds only the ask-someone actions with the model's drafted question", async () => {
+  const dashboard = await readFile(new URL("app/APWorkbench.tsx", root), "utf8");
+  assert.match(dashboard, /const draftedQuestion = recommendation\?\.questionForSubmitter/);
+  // The two actions that ask a person something may start from the model's draft.
+  // Each handler ends at its own </button>, so slice there rather than by character
+  // count — a fixed window runs into the next button and reads its prefill instead.
+  const handler = (mode) => {
+    const from = dashboard.indexOf(`setResolutionMode("${mode}")`);
+    assert.notEqual(from, -1, `no handler for ${mode}`);
+    return dashboard.slice(from, dashboard.indexOf("</button>", from));
+  };
+  for (const mode of ["REQUEST", "REQUEST_AMOUNT"]) {
+    assert.match(handler(mode), /setResolutionNote\(draftedQuestion \|\|/);
+  }
+  // The actions that clear or escalate an exception must not: that justification is
+  // the operator's own, and a model-drafted reason for dismissing its own flag would
+  // be the model deciding by the back door.
+  for (const mode of ["OVERRIDE", "APPROVE_VARIANCE", "DISPUTE", "INCORRECT_VENDOR", "MATCH_BENEFICIARY"]) {
+    assert.doesNotMatch(handler(mode), /draftedQuestion/);
+  }
+});
+
 test("keeps the interactive assistant inside server finance guardrails", async () => {
   const [dashboard, route, agent] = await Promise.all([
     readFile(new URL("app/APWorkbench.tsx", root), "utf8"),

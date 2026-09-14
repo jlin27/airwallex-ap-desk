@@ -872,6 +872,10 @@ export default function APWorkbench() {
     READY_TO_VALIDATE: "",
   };
   const decidedBy = selected ? decidingCheck[selected.serverRecommendation.recommendation] : "";
+  // The model drafts a follow-up question on every triage. It seeds the composer only
+  // for actions that ask someone a question — never for the actions that clear an
+  // exception, where the justification has to be the operator's own.
+  const draftedQuestion = recommendation?.questionForSubmitter?.trim() || "";
   const caseClosed = Boolean(selected) && apQueueStatus(selected!) === "CLOSED";
   const detailsMissing = Boolean(selected) && (!selected?.description.trim() || !selected?.invoiceNumber.trim());
   const checkRows = selected ? [
@@ -1286,7 +1290,7 @@ export default function APWorkbench() {
                         <button onClick={() => setResolutionMode(resolutionMode === "COMPARE" ? null : "COMPARE")}>View matching bill</button>
                         <button className="dangerAction" disabled={Boolean(loading)} onClick={() => post("confirm_duplicate", selected.id, { matchingBillId: matchingBill.id })}>Confirm duplicate</button>
                         <button onClick={() => { setResolutionMode("OVERRIDE"); setResolutionNote(""); }}>Not a duplicate</button>
-                        <button onClick={() => { setResolutionMode("REQUEST"); setResolutionNote("Please confirm why two invoices with the same number were submitted and whether both should be paid."); }}>Request information</button>
+                        <button onClick={() => { setResolutionMode("REQUEST"); setResolutionNote(draftedQuestion || "Please confirm why two invoices with the same number were submitted and whether both should be paid."); }}>Request information</button>
                       </div>
                     )}
 
@@ -1303,7 +1307,7 @@ export default function APWorkbench() {
                         <label htmlFor="resolution-note">{resolutionMode === "OVERRIDE" ? "Why are both invoices legitimate?" : "What information do you need?"}</label>
                         <textarea id="resolution-note" value={resolutionNote} onChange={(event) => setResolutionNote(event.target.value)} placeholder={resolutionMode === "OVERRIDE" ? "Example: The invoices cover two separate project phases." : "Write the question for the submitter or vendor."} />
                         <div><button onClick={() => { setResolutionMode(null); setResolutionNote(""); }}>Cancel</button><button className="primaryButton" disabled={resolutionNote.trim().length < 5 || Boolean(loading)} onClick={() => post(resolutionMode === "OVERRIDE" ? "override_duplicate" : "request_information", selected.id, { note: resolutionNote, matchingBillId: matchingBill.id })}>{resolutionMode === "OVERRIDE" ? "Clear duplicate flag" : "Save information request"}</button></div>
-                        {resolutionMode === "REQUEST" && <small>This saves a pending request in the case record; it does not send an email.</small>}
+                        {resolutionMode === "REQUEST" && <small>{draftedQuestion ? "Drafted by the agent — edit before saving. " : ""}This saves a pending request in the case record; it does not send an email.</small>}
                       </div>
                     )}
                   </div>
@@ -1330,7 +1334,7 @@ export default function APWorkbench() {
                     ) : (
                       <div className="resolutionActions amountActions">
                         <button className="approveAction" disabled={Boolean(loading)} onClick={() => { setResolutionMode("APPROVE_VARIANCE"); setResolutionNote(""); }}>Approve variance</button>
-                        <button disabled={Boolean(loading)} onClick={() => { setResolutionMode("REQUEST_AMOUNT"); setResolutionNote(`Please explain the ${selected.observedAmountChangePercent}% increase and attach the contract, renewal notice, or other supporting documentation.`); }}>Request explanation</button>
+                        <button disabled={Boolean(loading)} onClick={() => { setResolutionMode("REQUEST_AMOUNT"); setResolutionNote(draftedQuestion || `Please explain the ${selected.observedAmountChangePercent}% increase and attach the contract, renewal notice, or other supporting documentation.`); }}>Request explanation</button>
                         <button className="dangerAction" disabled={Boolean(loading)} onClick={() => { setResolutionMode("DISPUTE"); setResolutionNote("The invoice amount does not match the agreed pricing and requires correction."); }}>Dispute bill</button>
                       </div>
                     )}
@@ -1340,7 +1344,7 @@ export default function APWorkbench() {
                         <label htmlFor="amount-resolution-note">{resolutionMode === "APPROVE_VARIANCE" ? "Approval reason or reference" : resolutionMode === "REQUEST_AMOUNT" ? "What explanation do you need?" : "Why is the bill being disputed?"}</label>
                         <textarea id="amount-resolution-note" value={resolutionNote} onChange={(event) => setResolutionNote(event.target.value)} placeholder={resolutionMode === "APPROVE_VARIANCE" ? "Example: Renewal approved by the infrastructure budget owner." : "Add context for the audit trail."} />
                         <div><button onClick={() => { setResolutionMode(null); setResolutionNote(""); }}>Cancel</button><button className="primaryButton" disabled={resolutionNote.trim().length < 5 || Boolean(loading)} onClick={() => post(resolutionMode === "APPROVE_VARIANCE" ? "approve_variance" : resolutionMode === "REQUEST_AMOUNT" ? "request_amount_explanation" : "dispute_bill", selected.id, { note: resolutionNote })}>{resolutionMode === "APPROVE_VARIANCE" ? "Approve variance" : resolutionMode === "REQUEST_AMOUNT" ? "Save explanation request" : "Mark bill disputed"}</button></div>
-                        {resolutionMode === "REQUEST_AMOUNT" && <small>This saves a pending request in the case record; it does not send an email.</small>}
+                        {resolutionMode === "REQUEST_AMOUNT" && <small>{draftedQuestion ? "Drafted by the agent — edit before saving. " : ""}This saves a pending request in the case record; it does not send an email.</small>}
                       </div>
                     )}
                   </div>
