@@ -223,7 +223,6 @@ h1, h2, h3, p { margin-top: 0; }
 .decisionPill { display: inline-block; padding: 5px 7px; border-radius: 5px; font-size: 8px; font-weight: 850; text-transform: uppercase; letter-spacing: .04em; }
 .decisionPill.review { background: var(--amber-soft); color: var(--amber); }
 .decisionPill.ready { background: var(--green-soft); color: var(--green); }
-.decisionSource { margin-bottom: 5px; color: var(--muted); font-size: 9px; }
 .confidenceLine { margin-bottom: 16px; color: var(--muted); font-size: 9px; text-transform: capitalize; }
 .validatedBox > span { font: 750 8px var(--font-geist-mono), monospace; text-transform: uppercase; letter-spacing: .05em; }
 .fallbackText, .actionNote { color: #738396; font-size: 9px; line-height: 1.5; }
@@ -453,7 +452,6 @@ h1, h2, h3, p { margin-top: 0; }
 
 /* Agent panel: the explanation and the chat are one surface, not two sections */
 .visuallyHidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-.decisionCategory { text-transform: capitalize; }
 .assistantPrompts { margin: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px; }
 .payoutAction { position: sticky; bottom: 0; margin-top: auto; padding: 14px 0 18px; background: linear-gradient(to bottom, rgba(249, 250, 249, 0), #f8f9fb 22%); border-top: 1px solid var(--line); }
 .auditToggle { min-height: 30px; padding: 0 9px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line-strong); border-radius: 6px; background: white; color: #405165; font-size: 10px; font-weight: 700; }
@@ -476,6 +474,15 @@ h1, h2, h3, p { margin-top: 0; }
 .decisionBlock { padding: 22px 25px 20px; border-bottom: 1px solid var(--line); }
 .decisionBlock h2 { margin: 13px 0 7px; font-size: 19px; line-height: 1.35; letter-spacing: -.03em; }
 .decisionBlock .why { margin: 12px 0 0; }
+/* Priority is the server's urgency call and carries the semantic colour; confidence and
+   category are the model's reading and stay quiet outlines beside it. */
+.decisionMeta { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.metaChip { padding: 4px 7px; border: 1px solid transparent; border-radius: 5px; font: 850 8px var(--font-geist-mono), monospace; text-transform: uppercase; letter-spacing: .04em; cursor: default; }
+.metaChip.priority.high { background: var(--red-soft); color: var(--red); }
+.metaChip.priority.medium { background: var(--amber-soft); color: var(--amber); }
+.metaChip.priority.low { background: var(--green-soft); color: var(--green); }
+.metaChip.judgement { border-color: var(--line-strong); color: #52627a; }
+.metaChip.fallbackChip { background: #eef2f7; color: #52627a; }
 .decisionBlock.pending h2 { color: var(--muted); font-weight: 600; }
 .decisionPill.waiting { background: #eef2f7; color: #64748b; }
 

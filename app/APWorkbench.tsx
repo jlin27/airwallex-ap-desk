@@ -1208,7 +1208,12 @@ export default function APWorkbench() {
                   <div className="decisionBlock">
                     <span className={`decisionPill ${recommendation?.recommendation === "READY_TO_VALIDATE" ? "ready" : "review"}`}>{recommendation && recommendationLabels[recommendation.recommendation]}</span>
                     <h2>{recommendation?.summary}</h2>
-                    <p className="decisionSource">Server decision · explained by the {recommendation?.source === "AI_GATEWAY" ? "model" : "fallback"} · {recommendation?.confidence.toLowerCase()} confidence · <span className="decisionCategory">{recommendation?.suggestedCategory.replaceAll("_", " ").toLowerCase()}</span></p>
+                    <div className="decisionMeta">
+                      <span className={`metaChip priority ${recommendation?.priority.toLowerCase()}`} title="Urgency, set by the server from the recommendation code">{recommendation?.priority.toLowerCase()} priority</span>
+                      <span className="metaChip judgement" title="How strongly the evidence rules out the innocent reading — the model's own rating, which never changes the decision">{recommendation?.confidence.toLowerCase()} confidence</span>
+                      <span className="metaChip judgement" title="Expense type, classified by the model">{recommendation?.suggestedCategory.replaceAll("_", " ").toLowerCase()}</span>
+                      {recommendation?.source === "SAFE_FALLBACK" && <span className="metaChip fallbackChip" title="The live model was unavailable; server checks and gates are unchanged">safe fallback</span>}
+                    </div>
                     {(recommendation?.reasons || []).map((reason) => <p className="why" key={reason}>{reason}</p>)}
                     {recommendation?.source === "SAFE_FALLBACK" && <p className="fallbackText">Live model reasoning was unavailable. The same server-established facts and safety gates remain in force.</p>}
                   </div>
