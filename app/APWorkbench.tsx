@@ -1551,12 +1551,6 @@ export default function APWorkbench() {
             </div>
 
             <div className="sideRail">
-              <div className="railCard">
-                <div className="railHead"><h3>What did not happen</h3></div>
-                <div className="boundaryRow"><i>✗</i><div><strong>No transfer was created</strong><small>Validation confirms the instructions are payable. It does not queue, schedule, or send them.</small></div></div>
-                <div className="boundaryRow"><i>✗</i><div><strong>No funds left the wallet</strong><small>The {currentPayout.airwallex.sourceCurrency} balance is unchanged.</small></div></div>
-                <div className="boundaryRow"><i>✗</i><div><strong>The model approved nothing</strong><small>Every state change on this bill was made by server code or by a person, on the record.</small></div></div>
-              </div>
               <div className="nextCard">
                 <h3>Releasing payment</h3>
                 <p>Creating the transfer is the only step that moves money, and it is deliberately absent from this prototype. The decision record above is what a person would hand to whoever releases it.</p>

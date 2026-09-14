@@ -14,7 +14,7 @@ test("presents the complete AP exception workflow", async () => {
   for (const label of [
     "Bills to review", "Verified financial facts", "Bill pipeline",
     "Resolve possible duplicate", "Resolve amount change", "Resolve beneficiary",
-    "Validate payout with Airwallex", "View decision record", "What did not happen",
+    "Validate payout with Airwallex", "View decision record", "Releasing payment",
     "Ask about this bill", "Invoices arriving in AP", "unfiled", "Paste text instead",
   ]) {
     assert.match(dashboard, new RegExp(label));

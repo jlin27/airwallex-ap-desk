@@ -443,15 +443,6 @@ h1, h2, h3, p { margin-top: 0; }
 .trailBody strong { display: block; font-size: 11px; }
 .trailBody p { margin: 5px 0 0; color: var(--muted); font-size: 9px; line-height: 1.5; }
 .decisionStage .sideRail { display: grid; gap: 14px; align-content: start; }
-.railCard { border: 1px solid var(--line); border-radius: 10px; background: var(--panel); overflow: hidden; }
-.railHead { padding: 15px 16px 13px; border-bottom: 1px solid var(--line); }
-.railHead h3 { margin: 0; font-size: 13px; letter-spacing: -.02em; }
-.boundaryRow { padding: 12px 16px; display: flex; align-items: flex-start; gap: 10px; border-bottom: 1px solid #e8ebe9; }
-.boundaryRow:last-child { border-bottom: 0; }
-.boundaryRow i { flex: 0 0 auto; width: 20px; height: 20px; display: grid; place-items: center; border-radius: 50%; background: #edf0ee; color: #7b8580; font: 850 9px var(--font-geist-mono), monospace; font-style: normal; }
-.boundaryRow strong, .boundaryRow small { display: block; }
-.boundaryRow strong { font-size: 10px; color: #4f5953; }
-.boundaryRow small { margin-top: 4px; color: var(--muted); font-size: 9px; line-height: 1.45; }
 .nextCard { padding: 16px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
 .nextCard h3 { margin: 0 0 9px; font-size: 13px; letter-spacing: -.02em; }
 .nextCard p { margin: 0 0 13px; color: var(--muted); font-size: 10px; line-height: 1.55; }
