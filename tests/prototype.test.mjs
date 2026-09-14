@@ -12,7 +12,7 @@ test("presents the complete AP exception workflow", async () => {
   assert.match(dashboard, /Reset the demo\?/);
   assert.match(dashboard, /Retiring a bill cannot be undone/);
   for (const label of [
-    "Bills to review", "Verified financial facts", "Bill pipeline",
+    "Bills to review", "Server checks", "Bill pipeline",
     "Resolve possible duplicate", "Resolve amount change", "Resolve beneficiary",
     "Validate payout with Airwallex", "View decision record", "Why the log shows a transfers call",
     "Ask about this bill", "Invoices arriving in AP", "unfiled", "Paste text instead",
@@ -33,17 +33,24 @@ test("presents the complete AP exception workflow", async () => {
   assert.match(dashboard, /Reopen beneficiary case/);
 });
 
-test("shows reasoning evidence with semantic status indicators", async () => {
+test("attaches the model's reasoning to the check the server decision turns on", async () => {
   const [dashboard, styles] = await Promise.all([
     readFile(new URL("app/APWorkbench.tsx", root), "utf8"),
     readFile(new URL("app/globals.css", root), "utf8"),
   ]);
-  assert.match(dashboard, /blocked: "×"/);
-  assert.match(dashboard, /review: "!"/);
-  assert.match(dashboard, /unchecked: "—"/);
-  assert.match(dashboard, /function reasonTone/);
-  assert.match(styles, /li\.blocked > span \{ color: var\(--red\)/);
-  assert.match(styles, /li\.unchecked > span \{ color: var\(--muted\)/);
+  // The reason rows are keyed off the server recommendation, not off keywords in the
+  // model's prose: every recommendation code must name the check it hangs on.
+  const map = dashboard.slice(dashboard.indexOf("const decidingCheck"), dashboard.indexOf("const decidedBy"));
+  for (const code of [
+    "REVIEW_DUPLICATE", "REVIEW_AMOUNT_CHANGE", "MISSING_BENEFICIARY",
+    "BENEFICIARY_CURRENCY_MISMATCH", "INSUFFICIENT_FUNDS", "REQUEST_INFORMATION",
+    "READY_TO_VALIDATE",
+  ]) {
+    assert.match(map, new RegExp(`${code}: "`));
+  }
+  assert.match(dashboard, /decidedBy === row\.key/);
+  assert.doesNotMatch(dashboard, /function reasonTone/);
+  assert.match(styles, /\.why \{[^}]*border-left: 2px solid var\(--blue\)/);
   const beneficiaryTone = dashboard.slice(dashboard.indexOf("const beneficiaryCheckTone"), dashboard.indexOf("const beneficiaryCheckText"));
   assert.match(beneficiaryTone, /: "warn";/);
   assert.doesNotMatch(beneficiaryTone, /: "neutral";/);

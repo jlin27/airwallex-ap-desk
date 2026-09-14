@@ -496,45 +496,6 @@ function initials(name: string) {
   return name.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "—";
 }
 
-type ReasonTone = "pass" | "blocked" | "review" | "unchecked";
-
-const reasonIcons: Record<ReasonTone, string> = {
-  pass: "✓",
-  blocked: "×",
-  review: "!",
-  unchecked: "—",
-};
-
-function reasonTone(reason: string, bill: BillCase | null): ReasonTone {
-  if (!bill) return "unchecked";
-
-  const normalized = reason.toLowerCase();
-  const facts = bill.facts;
-
-  if (/fund|wallet|balance/.test(normalized)) {
-    if (!facts.beneficiaryId || !facts.transferRouteAvailable || !facts.sourceCurrency) return "unchecked";
-    return facts.hasSufficientBalance ? "pass" : "blocked";
-  }
-
-  if (/beneficiary|payout route|transfer route/.test(normalized)) {
-    return facts.beneficiaryId && facts.transferRouteAvailable ? "pass" : "blocked";
-  }
-
-  if (/duplicate|matching (bill|invoice)/.test(normalized)) {
-    return facts.duplicateBillIds.length > 0 ? "blocked" : "pass";
-  }
-
-  if (/amount|prior average|increase|variance/.test(normalized)) {
-    return facts.amountChangePercent !== null && facts.amountChangePercent >= 25 ? "review" : "pass";
-  }
-
-  if (/invoice number|description|missing information/.test(normalized)) {
-    return bill.invoiceNumber.trim() && bill.description.trim() ? "pass" : "blocked";
-  }
-
-  return "unchecked";
-}
-
 export default function APWorkbench() {
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -901,6 +862,30 @@ export default function APWorkbench() {
             ? "Payout validation is disabled until the missing bill information is supplied."
             : "Resolve the exception before payout validation can run.";
 
+  // Which check the server decision actually turns on. The model's reasons are
+  // attached to that row, so the explanation sits next to the fact it explains.
+  const decidingCheck: Record<RecommendationCode, string> = {
+    REVIEW_DUPLICATE: "duplicate",
+    REVIEW_AMOUNT_CHANGE: "amount",
+    MISSING_BENEFICIARY: "beneficiary",
+    BENEFICIARY_CURRENCY_MISMATCH: "beneficiary",
+    INSUFFICIENT_FUNDS: "funds",
+    REQUEST_INFORMATION: "details",
+    READY_TO_VALIDATE: "",
+  };
+  const decidedBy = selected ? decidingCheck[selected.serverRecommendation.recommendation] : "";
+  const detailsMissing = Boolean(selected) && (!selected?.description.trim() || !selected?.invoiceNumber.trim());
+  const checkRows = selected ? [
+    { key: "duplicate", label: "Duplicate check", tone: duplicateCheckTone, text: duplicateCheckText },
+    { key: "amount", label: "Amount history", tone: amountCheckTone, text: amountCheckText },
+    { key: "details", label: "Bill details", tone: detailsMissing ? "warn" : "pass",
+      text: detailsMissing
+        ? `Missing ${[!selected.invoiceNumber.trim() && "invoice number", !selected.description.trim() && "description"].filter(Boolean).join(" and ")}`
+        : "Invoice number and description present" },
+    { key: "beneficiary", label: "Beneficiary and route", tone: beneficiaryCheckTone, text: beneficiaryCheckText },
+    { key: "funds", label: "Wallet funds", tone: selected.facts.hasSufficientBalance ? "pass" : "neutral", text: fundingSummary(selected.facts) },
+  ] : [];
+
   function chooseBill(id: string) {
     setSelectedId(id);
     setAnalysis(null);
@@ -1214,24 +1199,37 @@ export default function APWorkbench() {
                     <p>{selected.description || "No description provided"}</p>
                     {selective(selected) && <button className="linkButton withdrawLink" type="button" disabled={Boolean(loading)} onClick={() => post("discard_intake_bill", selected.id)}>Withdraw this intake bill</button>}
                   </div>
-                  <div className="reviewAmount"><span>Amount due</span><strong>{money(selected.amount, selected.currency)}</strong><small>Due {shortDate(selected.dueDate)}</small></div>
+                  <div className="reviewAmount"><span>Amount due</span><strong>{money(selected.amount, selected.currency)}</strong><small>Due {shortDate(selected.dueDate)} · Issued {shortDate(selected.issuedDate)} · {selected.status.replaceAll("_", " ").toLowerCase()}</small></div>
                 </div>
 
-                <div className="detailGrid">
-                  <div><span>Bill status</span><strong>{selected.status.replaceAll("_", " ")}</strong></div>
-                  <div><span>Issued</span><strong>{shortDate(selected.issuedDate)}</strong></div>
-                  <div><span>Beneficiary</span><strong>{selected.facts.beneficiaryName || "Not matched"}</strong></div>
-                  <div><span>Funding wallet</span><strong>{selected.facts.sourceCurrency || "Not determined"}</strong></div>
-                </div>
-
-                <div className="factsSection">
-                  <div className="sectionTitle"><div><p className="eyebrow">Server checks</p><h3>Verified financial facts</h3></div><span className="livePill"><i /> Live API data</span></div>
-                  <div className="factRows">
-                    <div><span className={`factIcon ${duplicateCheckTone}`}>{duplicateCheckTone === "pass" ? "✓" : "!"}</span><p><strong>Duplicate check</strong><small>{duplicateCheckText}</small></p></div>
-                    <div><span className={`factIcon ${amountCheckTone}`}>{amountCheckTone === "pass" ? "✓" : "!"}</span><p><strong>Amount history</strong><small>{amountCheckText}</small></p></div>
-                    <div><span className={`factIcon ${beneficiaryCheckTone}`}>{beneficiaryCheckTone === "pass" ? "✓" : beneficiaryCheckTone === "neutral" ? "—" : "!"}</span><p><strong>Beneficiary and route</strong><small>{beneficiaryCheckText}</small></p></div>
-                    <div><span className={selected.facts.hasSufficientBalance ? "factIcon pass" : "factIcon neutral"}>{selected.facts.hasSufficientBalance ? "✓" : "—"}</span><p><strong>Wallet funds</strong><small>{fundingSummary(selected.facts)}</small></p></div>
+                {currentAnalysis ? (
+                  <div className="decisionBlock">
+                    <span className={`decisionPill ${recommendation?.recommendation === "READY_TO_VALIDATE" ? "ready" : "review"}`}>{recommendation && recommendationLabels[recommendation.recommendation]}</span>
+                    <h2>{recommendation?.summary}</h2>
+                    <p className="decisionSource">Server decision · explained by the {recommendation?.source === "AI_GATEWAY" ? "model" : "fallback"} · {recommendation?.confidence.toLowerCase()} confidence · <span className="decisionCategory">{recommendation?.suggestedCategory.replaceAll("_", " ").toLowerCase()}</span></p>
+                    {(recommendation?.reasons || []).map((reason) => <p className="why" key={reason}>{reason}</p>)}
+                    {recommendation?.source === "SAFE_FALLBACK" && <p className="fallbackText">Live model reasoning was unavailable. The same server-established facts and safety gates remain in force.</p>}
                   </div>
+                ) : (
+                  <div className="decisionBlock pending">
+                    <span className="decisionPill waiting">Not yet reviewed</span>
+                    <h2>{apQueueStatus(selected) === "CLOSED" ? "This case is closed" : apQueueStatus(selected) === "ON_HOLD" ? "Waiting on someone" : "Waiting for triage"}</h2>
+                    <p className="decisionSource">Server code decides the outcome; the model explains it. You remain in control of payment.</p>
+                  </div>
+                )}
+
+                <div className="checksSection">
+                  <div className="checksTitle"><p className="eyebrow">Server checks · live Airwallex data</p></div>
+                  {checkRows.map((row) => (
+                    <div className={`chk ${row.tone} ${decidedBy === row.key ? "deciding" : ""}`} key={row.key}>
+                      <span className="chkIcon">{row.tone === "pass" ? "✓" : row.tone === "neutral" ? "—" : "!"}</span>
+                      <div>
+                        <div className="chkRow"><strong>{row.label}</strong><em>{row.tone === "pass" ? "Passed" : row.tone === "neutral" ? "Not checked" : "Exception"}</em></div>
+                        <small>{row.text}</small>
+                        {decidedBy === row.key && <p className="decidesNote">This check sets the recommendation above.</p>}
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
                 {(selected.previousBills || []).length > 0 && (
@@ -1411,93 +1409,61 @@ export default function APWorkbench() {
                   </div>
                 )}
 
+                <div className="payoutAction">
+                  {currentPayout ? (
+                    <button className="secondaryButton fullWidth" type="button" onClick={() => setStage("DECISION")}>View decision record</button>
+                  ) : (
+                    <button className="primaryButton fullWidth" disabled={!isReady || Boolean(loading)} onClick={() => post("validate", selected.id)}>Validate payout with Airwallex</button>
+                  )}
+                  {!isReady && <p className="actionNote">{payoutBlockReason}</p>}
+                </div>
               </>
             ) : <div className="emptyReview"><strong>Select a bill to review</strong><p>Airwallex bill details and verified exception facts will appear here.</p></div>}
           </section>
 
-          <aside className="agentPanel" aria-label="Agent recommendation">
-            <div className="agentPanelHeader">
-              <p className="eyebrow">AP exception agent</p>
+          <aside className="chatPanel" aria-label="Ask about this bill">
+            <div className="chatHeader">
+              <div><p className="eyebrow">Bill assistant</p><h3>Ask about {selected?.vendor || "this bill"}</h3></div>
               {recommendation && <span className={recommendation.source === "AI_GATEWAY" ? "modelBadge live" : "modelBadge"}>{recommendation.source === "AI_GATEWAY" ? "Live model" : "Safe fallback"}</span>}
             </div>
-            {!currentAnalysis ? (
-              <div className="agentStart">
-                <span className="agentGlyph">✦</span>
-                {selected && apQueueStatus(selected) === "CLOSED" ? (
-                  <>
-                    <h2>This case is closed</h2>
-                    <p>A person confirmed the exception, so the agent has nothing left to explain. Reopen the case to review it again. You remain in control of payment.</p>
-                  </>
-                ) : selected && apQueueStatus(selected) === "ON_HOLD" ? (
-                  <>
-                    <h2>Waiting on someone</h2>
-                    <p>This case is on hold pending information or a correction. Server code decides the outcome; the model explains it. You remain in control of payment.</p>
-                  </>
-                ) : (
-                  <>
-                    <h2>Waiting for triage</h2>
-                    <p>Every open bill is reviewed automatically after each Airwallex refresh. Server code decides the outcome; the model explains it. You remain in control of payment.</p>
-                  </>
-                )}
-              </div>
-            ) : (
-              <div className="agentResult">
-                <span className={`decisionPill ${recommendation?.recommendation === "READY_TO_VALIDATE" ? "ready" : "review"}`}>{recommendation && recommendationLabels[recommendation.recommendation]}</span>
-                <h2>{recommendation?.summary}</h2>
-                <p className="decisionSource">Server decision · explained by the {recommendation?.source === "AI_GATEWAY" ? "model" : "fallback"} · {recommendation?.confidence.toLowerCase()} confidence · <span className="decisionCategory">{recommendation?.suggestedCategory.replaceAll("_", " ").toLowerCase()}</span></p>
-                <ul>{recommendation?.reasons.map((reason) => {
-                  const tone = reasonTone(reason, selected);
-                  return <li className={`reasonItem ${tone}`} key={reason}><span aria-hidden="true">{reasonIcons[tone]}</span>{reason}</li>;
-                })}</ul>
-                {recommendation?.source === "SAFE_FALLBACK" && <p className="fallbackText">Live model reasoning was unavailable. The same server-established facts and safety gates remain in force.</p>}
 
-                <section className="assistantSection" aria-label="Ask about this bill">
-                  {assistantMessages.length > 0 && (
-                  <div className="assistantMessages" aria-live="polite">
-                    {assistantMessages.map((message) => (
-                      <div className={`assistantMessage ${message.role === "USER" ? "user" : "assistant"}`} key={message.id}>
-                        <div>
-                          <strong>{message.role === "USER" ? "You" : "AI assistant"}</strong>
-                          <span className={message.label.toLowerCase().includes("unverified") ? "unverified" : ""}>{message.label}</span>
-                          {message.source && <em className={message.source === "AI_GATEWAY" ? "live" : ""}>{message.source === "AI_GATEWAY" ? "Live model" : "Safe fallback"}</em>}
-                        </div>
-                        <p>{message.text}</p>
-                      </div>
-                    ))}
-                  </div>
-                  )}
-                  {assistantLoading && <div className="assistantThinking"><span className="loader" />Reviewing the current bill facts…</div>}
-
-                  <form className="assistantComposer" onSubmit={(event) => { event.preventDefault(); askAssistant(assistantQuestion); }}>
-                    <p className="assistantLead">Ask the agent about {selected?.vendor || "this bill"}</p>
-                    <div className="assistantPrompts" aria-label="Suggested questions">
-                      {assistantPrompts.chips.map((chip) => (
-                        <button key={chip.label} type="button" disabled={assistantLoading} onClick={() => askAssistant(chip.question, "Question")}>{chip.label}</button>
-                      ))}
-                    </div>
-                    <label className="visuallyHidden" htmlFor="assistant-question">Ask a question or add context</label>
-                    <textarea
-                      id="assistant-question"
-                      rows={2}
-                      maxLength={1000}
-                      value={assistantQuestion}
-                      onChange={(event) => setAssistantQuestion(event.target.value)}
-                      placeholder={assistantPrompts.placeholder}
-                    />
-                    <div><small>Anything entered here is treated as unverified.</small><button className="primaryButton" type="submit" disabled={assistantQuestion.trim().length < 2 || assistantLoading}>Ask assistant</button></div>
-                  </form>
-                </section>
-              </div>
-            )}
-
-            <div className="payoutAction">
-              {currentPayout ? (
-                <button className="secondaryButton fullWidth" type="button" onClick={() => setStage("DECISION")}>View decision record</button>
-              ) : (
-                <button className="primaryButton" disabled={!isReady || Boolean(loading)} onClick={() => selected && post("validate", selected.id)}>Validate payout with Airwallex</button>
+            <div className="chatMessages" aria-live="polite">
+              {assistantMessages.length === 0 && !assistantLoading && (
+                <div className="chatEmpty">
+                  <span className="agentGlyph">✦</span>
+                  <p>The assistant answers from the same server-verified facts shown in the checks. It cannot change the decision or release a payment.</p>
+                </div>
               )}
-              {!isReady && <p className="actionNote">{payoutBlockReason}</p>}
+              {assistantMessages.map((message) => (
+                <div className={`chatMessage ${message.role === "USER" ? "user" : "assistant"}`} key={message.id}>
+                  <div>
+                    <strong>{message.role === "USER" ? "You" : "AI assistant"}</strong>
+                    <span className={message.label.toLowerCase().includes("unverified") ? "unverified" : ""}>{message.label}</span>
+                    {message.source && <em className={message.source === "AI_GATEWAY" ? "live" : ""}>{message.source === "AI_GATEWAY" ? "Live model" : "Safe fallback"}</em>}
+                  </div>
+                  <p>{message.text}</p>
+                </div>
+              ))}
+              {assistantLoading && <div className="assistantThinking"><span className="loader" />Reviewing the current bill facts…</div>}
             </div>
+
+            <form className="chatFooter" onSubmit={(event) => { event.preventDefault(); askAssistant(assistantQuestion); }}>
+              <div className="assistantPrompts" aria-label="Suggested questions">
+                {assistantPrompts.chips.map((chip) => (
+                  <button key={chip.label} type="button" disabled={assistantLoading} onClick={() => askAssistant(chip.question, "Question")}>{chip.label}</button>
+                ))}
+              </div>
+              <label className="visuallyHidden" htmlFor="assistant-question">Ask a question or add context</label>
+              <textarea
+                id="assistant-question"
+                rows={2}
+                maxLength={1000}
+                value={assistantQuestion}
+                onChange={(event) => setAssistantQuestion(event.target.value)}
+                placeholder={assistantPrompts.placeholder}
+              />
+              <div><small>Anything entered here is treated as unverified.</small><button className="primaryButton" type="submit" disabled={assistantQuestion.trim().length < 2 || assistantLoading}>Ask assistant</button></div>
+            </form>
           </aside>
         </div>
         </>)}
