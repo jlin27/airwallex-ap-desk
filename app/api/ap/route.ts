@@ -535,6 +535,7 @@ async function seedDemoData(token: string, apiCalls?: AirwallexApiTrace) {
     { externalId: "AP-DEMO-PAYROLL-VENDOR", name: payrollRoute.displayName },
     { externalId: "AP-DEMO-CLOUD-VENDOR", name: "Northstar Cloud" },
     { externalId: "AP-DEMO-STUDIO-VENDOR", name: "Studio North" },
+    { externalId: "AP-DEMO-FREIGHT-VENDOR", name: "Harbourline Logistics" },
   ];
   const vendorIds = new Map<string, string>();
   let vendorsCreated = 0;
@@ -565,6 +566,8 @@ async function seedDemoData(token: string, apiCalls?: AirwallexApiTrace) {
     { externalId: "AP-DEMO-CLOUD-CURRENT", vendorKey: "AP-DEMO-CLOUD-VENDOR", invoice: "NC-0901", amount: 138, currency: "USD", issue: 0, due: 12, description: "Cloud infrastructure subscription", history: false },
     { externalId: "AP-DEMO-STUDIO-ORIGINAL", vendorKey: "AP-DEMO-STUDIO-VENDOR", invoice: "SN-552", amount: 500, currency: "USD", issue: -4, due: -1, description: "Product design services", history: true },
     { externalId: "AP-DEMO-STUDIO-DUPLICATE", vendorKey: "AP-DEMO-STUDIO-VENDOR", invoice: "SN-552", amount: 500, currency: "USD", issue: 0, due: 14, description: "Product design services", history: false, keepInvoiceNumber: true },
+    { externalId: "AP-DEMO-FREIGHT-PAID", vendorKey: "AP-DEMO-FREIGHT-VENDOR", invoice: "HL-4417", amount: 2400, currency: "USD", issue: -6, due: -1, description: "Freight forwarding services", history: true },
+    { externalId: "AP-DEMO-FREIGHT-RESUBMIT", vendorKey: "AP-DEMO-FREIGHT-VENDOR", invoice: "HL-4452", amount: 2400, currency: "USD", issue: 0, due: 14, description: "Freight forwarding services", history: false },
   ];
 
   let billsCreated = 0;

@@ -344,7 +344,12 @@ instructions.
   wallet balance has not been checked yet", not "fundingStatus is NOT_CHECKED").
 - questionForSubmitter: what a person should ask to move this forward, or null when nothing is needed.
 - suggestedCategory: your read of the expense type.
-- confidence: how clearly the supplied facts support your explanation.
+- confidence: how strongly the evidence rules out the innocent reading of this exception.
+  HIGH when the facts leave little room for doubt (an identical invoice number, a payout
+  route that is simply absent). LOW when the same facts are about as consistent with a
+  legitimate bill as with a problem (a repeated amount under a different invoice number,
+  a variance measured against a single prior bill). This rates the evidence, not how well
+  you wrote the explanation, and it never changes the decision.
 
 If fundingStatus is NOT_CHECKED, the wallet balance has not been evaluated. Do not claim that
 funds are insufficient. Never state that a payment was approved, scheduled, sent or paid.`;
