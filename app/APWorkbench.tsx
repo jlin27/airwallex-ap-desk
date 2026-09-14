@@ -1548,7 +1548,7 @@ export default function APWorkbench() {
               <p>Calls appear here after every refresh, triage run, and payout validation. Credentials and record IDs stay on the server.</p>
             </div>
             <div className="apiActivityActions">
-              {auditOpen && apiActivity.length > 0 && <button onClick={() => setApiActivity([])}>Clear log</button>}
+              {auditOpen && apiActivity.length > 0 && <button className="clearLogButton" type="button" onClick={() => setApiActivity([])}>Clear log</button>}
               <span className={`livePill ${loading ? "calling" : ""}`}><i /> {loading ? "Request active" : "Live log"}</span>
               <button
                 className="auditToggle"
@@ -1557,7 +1557,7 @@ export default function APWorkbench() {
                 aria-controls="api-activity-list"
                 onClick={() => setAuditOpen((current) => !current)}
               >
-                {auditOpen ? "Hide" : "Show"} {apiActivity.length} call{apiActivity.length === 1 ? "" : "s"}
+                {auditOpen ? "Hide" : "Show"} <b>{apiActivity.length}</b> call{apiActivity.length === 1 ? "" : "s"}
                 <svg viewBox="0 0 24 24" aria-hidden="true" className={auditOpen ? "flip" : ""}><path d="m6 9 6 6 6-6" /></svg>
               </button>
             </div>
