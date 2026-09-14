@@ -36,6 +36,32 @@ h1, h2, h3, p { margin-top: 0; }
 .sidebarToggle { margin-left: auto; width: 27px; height: 27px; display: grid; place-items: center; border: 1px solid #39463f; border-radius: 6px; background: #202b26; color: #aeb9b3; font-size: 17px; line-height: 1; }
 .sidebarToggle:hover { border-color: #53635a; color: white; }
 .apSidebarFooter { margin-top: auto; }
+/* Pipeline rail — the sidebar is the wayfinding now, so it runs vertically on dark */
+.railNav { margin-top: 32px; display: grid; }
+.railNav .flowStep { width: 100%; padding: 0; display: grid; grid-template-columns: 25px minmax(0, 1fr); align-items: center; gap: 11px; border: 0; background: transparent; text-align: left; }
+.railNav .flowStep i { width: 25px; height: 25px; display: grid; place-items: center; border-radius: 50%; font: 800 10px var(--font-geist-mono), monospace; font-style: normal; }
+.railNav .flowStep strong, .railNav .flowStep small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.railNav .flowStep strong { font-size: 12px; letter-spacing: -.01em; }
+.railNav .flowStep small { margin-top: 3px; font-size: 9px; }
+.railNav .flowStep.todo i { background: #242f2a; color: #7c8882; }
+.railNav .flowStep.todo strong { color: #8d9992; }
+.railNav .flowStep.todo small { color: #6b7772; }
+.railNav .flowStep.done i { background: #294535; color: #55c58b; }
+.railNav .flowStep.done strong { color: #c6d0ca; }
+.railNav .flowStep.done small { color: #8d9a93; }
+.railNav .flowStep.active i { background: #efaa45; color: var(--nav); }
+.railNav .flowStep.active strong { color: white; }
+.railNav .flowStep.active small { color: #aeb9b3; }
+.railNav .flowStep:hover:not(:disabled) strong { color: white; }
+.railNav .flowStep:disabled { cursor: not-allowed; }
+.railConnector { width: 1px; height: 16px; margin: 4px 0 4px 12px; background: #35423c; }
+.railConnector.done { background: #3d5a49; }
+.railStatus { margin-top: 16px; display: flex; align-items: center; gap: 7px; color: #8d9a93; font-size: 10px; font-weight: 650; }
+.railStatus em { padding: 4px 6px; border-radius: 4px; background: #2a3731; color: #aeb9b3; font: 700 8px var(--font-geist-mono), monospace; font-style: normal; text-transform: uppercase; }
+.railStatus em.live { background: #294535; color: #6fd3a0; }
+.railStatus .loader { width: 12px; height: 12px; border-color: #3d4a44; border-top-color: #6fd3a0; }
+.sidebarCollapsed .railNav .flowStep { grid-template-columns: 25px; justify-content: center; }
+.sidebarCollapsed .railNav .flowStep > span, .sidebarCollapsed .railStatus { display: none; }
 .sandboxBadge { min-height: 42px; padding: 0 11px; display: flex; align-items: center; gap: 8px; border: 1px solid #35423c; border-radius: 7px; color: #b7c2bc; font: 700 10px var(--font-geist-mono), monospace; text-transform: uppercase; letter-spacing: .05em; }
 .sandboxBadge i, .livePill i { width: 7px; height: 7px; border-radius: 50%; background: #55c58b; box-shadow: 0 0 0 3px #294535; }
 .profileRow { margin-top: 15px; padding: 15px 7px 0; border-top: 1px solid #2f3c36; display: flex; align-items: center; gap: 10px; }
@@ -305,6 +331,10 @@ h1, h2, h3, p { margin-top: 0; }
   .apShell { display: block; }
   .apShell.sidebarCollapsed { display: block; }
   .apSidebar { position: static; width: 100%; height: auto; padding: 12px 16px; flex-direction: row; align-items: center; gap: 14px; }
+  .railNav { margin: 0; display: flex; align-items: center; }
+  .railNav .flowStep small { display: none; }
+  .railConnector { width: 16px; height: 1px; margin: 0 8px; }
+  .railStatus { margin: 0 0 0 10px; }
   .apSidebarFooter { margin: 0 0 0 auto; display: flex; align-items: center; gap: 12px; }
   .apSidebarFooter .profileRow { margin: 0; padding: 0; border: 0; }
   .apBrandRow { flex: 0 0 auto; }
@@ -383,28 +413,6 @@ h1, h2, h3, p { margin-top: 0; }
 .intakeBlockers { margin: 16px 0 0; padding: 12px 14px 12px 30px; border: 1px solid #e6d3a8; border-radius: 7px; background: var(--amber-soft); color: var(--amber); font-size: 11px; line-height: 1.6; }
 @media (max-width: 900px) { .intakeGrid { grid-template-columns: minmax(0, 1fr); } }
 
-/* Pipeline rail — replaces the stacked demo/triage/intake strips */
-.flowRail { margin: 24px 0 18px; padding: 12px 16px; display: flex; align-items: center; gap: 0; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); }
-.flowStep { padding: 0; display: flex; align-items: center; gap: 10px; border: 0; background: transparent; text-align: left; }
-.flowStep i { width: 25px; height: 25px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; font: 800 10px var(--font-geist-mono), monospace; font-style: normal; }
-.flowStep strong, .flowStep small { display: block; white-space: nowrap; }
-.flowStep strong { font-size: 11px; letter-spacing: -.01em; }
-.flowStep small { margin-top: 3px; font-size: 9px; }
-.flowStep.todo i { background: #edf0ee; color: #97a09b; }
-.flowStep.todo strong { color: #97a09b; }
-.flowStep.todo small { color: #b3bab6; }
-.flowStep.done i { background: var(--green-soft); color: var(--green); }
-.flowStep.done strong { color: #4f5953; }
-.flowStep.done small { color: var(--muted); }
-.flowStep.active i { background: #26332c; color: #f0ad49; }
-.flowStep.active strong { color: var(--ink); }
-.flowStep.active small { color: var(--muted); }
-button.flowStep:hover:not(:disabled) strong { color: var(--ink); }
-.flowLine { flex: 1 1 auto; height: 1px; margin: 0 14px; background: var(--line); }
-.flowLine.done { background: #bcd7c7; }
-.railStatus { margin-left: 16px; display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 10px; font-weight: 650; white-space: nowrap; }
-.railStatus em { padding: 4px 6px; border-radius: 4px; background: #ecefed; color: #6e7772; font: 700 8px var(--font-geist-mono), monospace; font-style: normal; text-transform: uppercase; }
-.railStatus em.live { background: var(--blue-soft); color: var(--blue); }
 
 /* Decision record — the ending of the pipeline */
 .decisionStage { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 18px; }

@@ -913,6 +913,28 @@ export default function APWorkbench() {
           </a>
           <button className="sidebarToggle" type="button" aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"} title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"} onClick={() => setSidebarCollapsed((current) => !current)}>{sidebarCollapsed ? "›" : "‹"}</button>
         </div>
+        <nav className="railNav" aria-label="Bill pipeline">
+          <button type="button" className={`flowStep ${stage === "INTAKE" ? "active" : "done"}`} onClick={() => openIntake()}>
+            <i>1</i>
+            <span><strong>Inbox</strong><small>Read an invoice</small></span>
+          </button>
+          <span className="railConnector done" />
+          <button type="button" className={`flowStep ${stage === "REVIEW" ? "active" : "todo"}`} onClick={() => setStage("REVIEW")}>
+            <i>2</i>
+            <span><strong>Review</strong><small>{workspace ? `${workspace.summary.open} open · ${workspace.summary.needsAttention} need attention` : "Loading"}</small></span>
+          </button>
+          <span className="railConnector" />
+          <button type="button" className={`flowStep ${stage === "DECISION" ? "active" : payout ? "done" : "todo"}`} disabled={!payout} onClick={() => payout && setStage("DECISION")}>
+            <i>3</i>
+            <span><strong>Decision</strong><small>{payout ? "Cleared for payment" : "After exceptions clear"}</small></span>
+          </button>
+        </nav>
+        <div className="railStatus">
+          {triageStatus === "RUNNING" && <><i className="loader" />Triage running</>}
+          {triageStatus === "COMPLETE" && <em className={triageUsesLiveModel ? "live" : "fallback"}>{triageUsesLiveModel ? "Live model" : "Safe fallback"}</em>}
+          {triageStatus === "ERROR" && <em className="fallback">Server checks only</em>}
+        </div>
+
         <div className="apSidebarFooter">
           <div className="sandboxBadge"><i /><span>Airwallex Sandbox</span></div>
           <div className="profileRow"><span>DO</span><div><strong>Demo operator</strong><small>Unauthenticated session</small></div></div>
@@ -923,7 +945,7 @@ export default function APWorkbench() {
         <header className="apHeader">
           <div>
             <p className="eyebrow">Accounts payable</p>
-            <h1>{stage === "INTAKE" ? "Intake" : stage === "DECISION" ? "Payout decision" : "Bill review"}</h1>
+            <h1>{stage === "INTAKE" ? "Inbox" : stage === "DECISION" ? "Payout decision" : "Bill review"}</h1>
             <p>{stage === "INTAKE"
               ? "Invoices enter here. Nothing reaches Airwallex until the server validates it."
               : stage === "DECISION"
@@ -948,33 +970,11 @@ export default function APWorkbench() {
           </div>
         )}
 
-        <nav className="flowRail" aria-label="Bill pipeline">
-          <button type="button" className={`flowStep ${stage === "INTAKE" ? "active" : "done"}`} onClick={() => openIntake()}>
-            <i>1</i>
-            <span><strong>Intake</strong><small>Paste an invoice</small></span>
-          </button>
-          <span className="flowLine done" />
-          <button type="button" className={`flowStep ${stage === "REVIEW" ? "active" : "todo"}`} onClick={() => setStage("REVIEW")}>
-            <i>2</i>
-            <span><strong>Review</strong><small>{workspace ? `${workspace.summary.open} open · ${workspace.summary.needsAttention} need attention` : "Loading"}</small></span>
-          </button>
-          <span className="flowLine" />
-          <button type="button" className={`flowStep ${stage === "DECISION" ? "active" : payout ? "done" : "todo"}`} disabled={!payout} onClick={() => payout && setStage("DECISION")}>
-            <i>3</i>
-            <span><strong>Decision</strong><small>{payout ? "Cleared for payment" : "After exceptions clear"}</small></span>
-          </button>
-          <span className="railStatus">
-            {triageStatus === "RUNNING" && <><i className="loader" />Triage running</>}
-            {triageStatus === "COMPLETE" && <em className={triageUsesLiveModel ? "live" : "fallback"}>{triageUsesLiveModel ? "Live model" : "Safe fallback"}</em>}
-            {triageStatus === "ERROR" && <em className="fallback">Server checks only</em>}
-          </span>
-        </nav>
-
         {stage === "INTAKE" && (
         <section className="intakePanel" aria-label="Invoice intake">
           <div className="intakeHeader">
             <div>
-              <p className="eyebrow">Step 1 &middot; Intake</p>
+              <p className="eyebrow">Step 1 &middot; Inbox</p>
               <h2>Invoices arriving in AP</h2>
               <p>Open a message and the agent reads it, proposing bill fields. Server code validates every field against live Airwallex vendors and balances before anything is created.</p>
             </div>
