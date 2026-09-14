@@ -795,8 +795,6 @@ export default function APWorkbench() {
     : selected ? triageAnalyses[selected.id] || null : null;
   const currentPayout = payout?.billId === selected?.id ? payout : null;
   const recommendation = currentAnalysis?.agent;
-  const triageResults = Object.values(triageAnalyses);
-  const triageUsesLiveModel = triageResults.some((result) => result.agent.source === "AI_GATEWAY");
   const isReady = selected?.serverRecommendation.recommendation === "READY_TO_VALIDATE";
   const matchingBill = selected?.duplicateMatches[0] || null;
   const duplicateResolution = selected?.resolution && ["CONFIRMED_DUPLICATE", "NOT_DUPLICATE", "REQUESTED_INFORMATION"].includes(selected.resolution.action)
@@ -874,6 +872,7 @@ export default function APWorkbench() {
     READY_TO_VALIDATE: "",
   };
   const decidedBy = selected ? decidingCheck[selected.serverRecommendation.recommendation] : "";
+  const caseClosed = Boolean(selected) && apQueueStatus(selected!) === "CLOSED";
   const detailsMissing = Boolean(selected) && (!selected?.description.trim() || !selected?.invoiceNumber.trim());
   const checkRows = selected ? [
     { key: "duplicate", label: "Duplicate check", tone: duplicateCheckTone, text: duplicateCheckText },
@@ -912,22 +911,21 @@ export default function APWorkbench() {
         <nav className="railNav" aria-label="Bill pipeline">
           <button type="button" className={`flowStep ${stage === "INTAKE" ? "active" : "done"}`} onClick={() => openIntake()}>
             <i>1</i>
-            <span><strong>Inbox</strong><small>Read an invoice</small></span>
+            <span><strong>Inbox</strong></span>
           </button>
           <span className="railConnector done" />
           <button type="button" className={`flowStep ${stage === "REVIEW" ? "active" : "todo"}`} onClick={() => setStage("REVIEW")}>
             <i>2</i>
-            <span><strong>Review</strong><small>{workspace ? `${workspace.summary.open} open · ${workspace.summary.needsAttention} need attention` : "Loading"}</small></span>
+            <span><strong>Review</strong></span>
           </button>
           <span className="railConnector" />
           <button type="button" className={`flowStep ${stage === "DECISION" ? "active" : payout ? "done" : "todo"}`} disabled={!payout} onClick={() => payout && setStage("DECISION")}>
             <i>3</i>
-            <span><strong>Decision</strong><small>{payout ? "Cleared for payment" : "After exceptions clear"}</small></span>
+            <span><strong>Decision</strong></span>
           </button>
         </nav>
         <div className="railStatus">
           {triageStatus === "RUNNING" && <><i className="loader" />Triage running</>}
-          {triageStatus === "COMPLETE" && <em className={triageUsesLiveModel ? "live" : "fallback"}>{triageUsesLiveModel ? "Live model" : "Safe fallback"}</em>}
           {triageStatus === "ERROR" && <em className="fallback">Server checks only</em>}
         </div>
 
@@ -1219,7 +1217,6 @@ export default function APWorkbench() {
                 )}
 
                 <div className="checksSection">
-                  <div className="checksTitle"><p className="eyebrow">Server checks · live Airwallex data</p></div>
                   {checkRows.map((row) => (
                     <div className={`chk ${row.tone} ${decidedBy === row.key ? "deciding" : ""}`} key={row.key}>
                       <span className="chkIcon">{row.tone === "pass" ? "✓" : row.tone === "neutral" ? "—" : "!"}</span>
@@ -1421,7 +1418,7 @@ export default function APWorkbench() {
             ) : <div className="emptyReview"><strong>Select a bill to review</strong><p>Airwallex bill details and verified exception facts will appear here.</p></div>}
           </section>
 
-          <aside className="chatPanel" aria-label="Ask about this bill">
+          <aside className={`chatPanel ${assistantMessages.length === 0 && !assistantLoading ? "empty" : ""}`} aria-label="Ask about this bill">
             <div className="chatHeader">
               <div><p className="eyebrow">Bill assistant</p><h3>Ask about {selected?.vendor || "this bill"}</h3></div>
               {recommendation && <span className={recommendation.source === "AI_GATEWAY" ? "modelBadge live" : "modelBadge"}>{recommendation.source === "AI_GATEWAY" ? "Live model" : "Safe fallback"}</span>}
@@ -1448,11 +1445,13 @@ export default function APWorkbench() {
             </div>
 
             <form className="chatFooter" onSubmit={(event) => { event.preventDefault(); askAssistant(assistantQuestion); }}>
-              <div className="assistantPrompts" aria-label="Suggested questions">
-                {assistantPrompts.chips.map((chip) => (
-                  <button key={chip.label} type="button" disabled={assistantLoading} onClick={() => askAssistant(chip.question, "Question")}>{chip.label}</button>
-                ))}
-              </div>
+              {!caseClosed && (
+                <div className="assistantPrompts" aria-label="Suggested questions">
+                  {assistantPrompts.chips.map((chip) => (
+                    <button key={chip.label} type="button" disabled={assistantLoading} onClick={() => askAssistant(chip.question, "Question")}>{chip.label}</button>
+                  ))}
+                </div>
+              )}
               <label className="visuallyHidden" htmlFor="assistant-question">Ask a question or add context</label>
               <textarea
                 id="assistant-question"
@@ -1462,7 +1461,7 @@ export default function APWorkbench() {
                 onChange={(event) => setAssistantQuestion(event.target.value)}
                 placeholder={assistantPrompts.placeholder}
               />
-              <div><small>Anything entered here is treated as unverified.</small><button className="primaryButton" type="submit" disabled={assistantQuestion.trim().length < 2 || assistantLoading}>Ask assistant</button></div>
+              <div><button className="primaryButton" type="submit" disabled={assistantQuestion.trim().length < 2 || assistantLoading}>Ask assistant</button></div>
             </form>
           </aside>
         </div>

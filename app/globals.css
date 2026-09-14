@@ -38,20 +38,20 @@ h1, h2, h3, p { margin-top: 0; }
 .apSidebarFooter { margin-top: auto; }
 /* Pipeline rail — the sidebar is the wayfinding now, so it runs vertically on dark */
 .railNav { margin-top: 32px; display: grid; }
-.railNav .flowStep { width: 100%; padding: 0; display: grid; grid-template-columns: 25px minmax(0, 1fr); align-items: center; gap: 11px; border: 0; background: transparent; text-align: left; }
+.railNav .flowStep { width: 100%; min-height: 25px; padding: 0; display: grid; grid-template-columns: 25px minmax(0, 1fr); align-items: center; gap: 11px; border: 0; background: transparent; text-align: left; }
 .railNav .flowStep i { width: 25px; height: 25px; display: grid; place-items: center; border-radius: 50%; font: 800 10px var(--font-geist-mono), monospace; font-style: normal; }
-.railNav .flowStep strong, .railNav .flowStep small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.railNav .flowStep strong { font-size: 12px; letter-spacing: -.01em; }
-.railNav .flowStep small { margin-top: 3px; font-size: 9px; }
+
+.railNav .flowStep strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; letter-spacing: -.01em; }
+
 .railNav .flowStep.todo i { background: #1b2c42; color: #6c8198; }
 .railNav .flowStep.todo strong { color: #7b8fa6; }
-.railNav .flowStep.todo small { color: #5c7086; }
+
 .railNav .flowStep.done i { background: #123f31; color: #3ecf8e; }
 .railNav .flowStep.done strong { color: #bbcadb; }
-.railNav .flowStep.done small { color: #7d92aa; }
+
 .railNav .flowStep.active i { background: #635bff; color: var(--nav); }
 .railNav .flowStep.active strong { color: white; }
-.railNav .flowStep.active small { color: #8fa2b7; }
+
 .railNav .flowStep:hover:not(:disabled) strong { color: white; }
 .railNav .flowStep:disabled { cursor: not-allowed; }
 .railConnector { width: 1px; height: 16px; margin: 4px 0 4px 12px; background: #14385c; }
@@ -78,7 +78,7 @@ h1, h2, h3, p { margin-top: 0; }
 .sidebarCollapsed .profileRow { margin-top: 10px; }
 
 .apMain { width: 100%; max-width: 1600px; padding: 36px 40px 64px; }
-.apHeader { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
+.apHeader { margin-bottom: 24px; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
 .eyebrow { margin-bottom: 8px; color: #6b7b8e; font: 750 10px var(--font-geist-mono), monospace; text-transform: uppercase; letter-spacing: .08em; }
 .apHeader h1 { margin-bottom: 7px; font-size: 24px; line-height: 1.15; letter-spacing: -.035em; }
 .apHeader > div > p:last-child { margin-bottom: 0; color: var(--muted); font-size: 14px; }
@@ -283,7 +283,6 @@ h1, h2, h3, p { margin-top: 0; }
   .apShell.sidebarCollapsed { display: block; }
   .apSidebar { position: static; width: 100%; height: auto; padding: 12px 16px; flex-direction: row; align-items: center; gap: 14px; }
   .railNav { margin: 0; display: flex; align-items: center; }
-  .railNav .flowStep small { display: none; }
   .railConnector { width: 16px; height: 1px; margin: 0 8px; }
   .railStatus { margin: 0 0 0 10px; }
   .apSidebarFooter { margin: 0 0 0 auto; display: flex; align-items: center; gap: 12px; }
@@ -332,7 +331,7 @@ h1, h2, h3, p { margin-top: 0; }
 .intakeHeader { padding: 16px 18px; display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
 .intakeHeader h2 { margin: 0 0 6px; font-size: 17px; letter-spacing: -.025em; }
 .intakeHeader p:last-child { margin: 0; max-width: 68ch; color: var(--muted); font-size: 12px; line-height: 1.55; }
-.intakeBody { padding: 0 18px 18px; border-top: 1px solid var(--line); }
+.intakeBody { padding: 18px; border-top: 1px solid var(--line); }
 .intakeField { margin-top: 14px; display: block; }
 .intakeField > span { display: flex; align-items: center; gap: 7px; color: #415163; font-size: 11px; font-weight: 700; }
 .intakeField textarea, .intakeField input { width: 100%; margin-top: 7px; padding: 10px; border: 1px solid var(--line-strong); border-radius: 6px; background: white; color: var(--ink); font: 11px/1.5 var(--font-geist-mono), monospace; }
@@ -360,7 +359,6 @@ h1, h2, h3, p { margin-top: 0; }
 .statusChip.rejected { background: var(--red-soft); color: var(--red); }
 .intakeBlockers { margin: 16px 0 0; padding: 12px 14px 12px 30px; border: 1px solid #e6d3a8; border-radius: 7px; background: var(--amber-soft); color: var(--amber); font-size: 11px; line-height: 1.6; }
 @media (max-width: 900px) { .intakeGrid { grid-template-columns: minmax(0, 1fr); } }
-
 
 /* Decision record — the ending of the pipeline */
 .decisionStage { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 18px; }
@@ -481,9 +479,7 @@ h1, h2, h3, p { margin-top: 0; }
 .decisionBlock.pending h2 { color: var(--muted); font-weight: 600; }
 .decisionPill.waiting { background: #eef2f7; color: #64748b; }
 
-.checksSection { padding: 4px 25px 22px; }
-.checksTitle { padding-top: 16px; }
-.checksTitle .eyebrow { margin: 0; }
+.checksSection { padding: 8px 25px 22px; }
 .chk { padding: 15px 0; display: grid; grid-template-columns: 23px minmax(0, 1fr); gap: 12px; border-bottom: 1px solid var(--line); }
 .chk:last-child { border-bottom: 0; }
 .chkIcon { width: 23px; height: 23px; display: grid; place-items: center; border-radius: 50%; font-size: 10px; font-weight: 850; }
@@ -509,7 +505,11 @@ h1, h2, h3, p { margin-top: 0; }
 .chatHeader .eyebrow { margin: 0 0 4px; }
 .chatHeader h3 { margin: 0; font-size: 15px; letter-spacing: -.025em; overflow-wrap: anywhere; }
 .chatMessages { flex: 1 1 auto; min-height: 0; padding: 18px 20px; display: grid; gap: 16px; align-content: start; overflow-y: auto; }
-.chatEmpty { padding: 34px 4px; text-align: center; }
+.chatEmpty { padding: 24px 4px 4px; text-align: center; }
+/* With no transcript there is nothing for the composer to sit under, so it rides
+   up under the header instead of being pinned below the fold. */
+.chatPanel.empty .chatMessages { flex: 0 0 auto; padding-bottom: 0; }
+.chatPanel.empty .chatFooter { border-top: 0; }
 .chatEmpty p { margin: 0 auto; max-width: 250px; color: var(--muted); font-size: 11px; line-height: 1.6; }
 .chatMessage { padding-left: 11px; border-left: 3px solid var(--blue); }
 .chatMessage.user { border-left-color: var(--amber); }
@@ -521,10 +521,10 @@ h1, h2, h3, p { margin-top: 0; }
 .chatMessage em.live { background: var(--green-soft); color: var(--green); }
 .chatMessage p { margin: 7px 0 0; color: #425466; font-size: 10.5px; line-height: 1.6; }
 .chatFooter { flex: 0 0 auto; padding: 14px 20px 18px; border-top: 1px solid var(--line); background: #f8f9fb; }
-.chatFooter .assistantPrompts { margin: 0 0 10px; }
+.chatFooter .assistantPrompts { margin: 0 0 10px; justify-content: flex-start; }
 .chatFooter textarea { width: 100%; min-height: 58px; padding: 9px 10px; resize: vertical; border: 1px solid var(--line-strong); border-radius: 6px; background: white; color: var(--ink); font: 10px/1.5 var(--font-geist-sans), Arial, sans-serif; }
 .chatFooter textarea:focus { outline: 2px solid rgba(99, 91, 255, .18); border-color: var(--blue); }
-.chatFooter > div { margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.chatFooter > div { margin-top: 8px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
 .chatFooter small { color: #78889b; font-size: 8px; line-height: 1.4; }
 .chatFooter .primaryButton { width: auto; min-width: 104px; flex: 0 0 auto; }
 

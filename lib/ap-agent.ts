@@ -33,12 +33,27 @@ export const apExplanationSchema = z.object({
     "NEEDS_CLARIFICATION",
   ]),
   summary: z.string().min(1).max(220),
-  reasons: z.array(z.string().min(1).max(180)).min(1).max(4),
+  reasons: z.array(z.string().min(1).max(260)).min(1).max(4),
   questionForSubmitter: z.string().min(1).max(220).nullable(),
   confidence: z.enum(["LOW", "MEDIUM", "HIGH"]),
 }).strict();
 
 export type ApExplanation = z.infer<typeof apExplanationSchema>;
+
+const SCHEMA_KEYS = new Set(Object.keys(apExplanationSchema.shape));
+
+/**
+ * Structured generation can degrade when a reason runs into its length cap: the string
+ * is forced closed mid-word and the next array element collapses into a schema key
+ * name. Neither is worth showing a finance operator, so both are dropped here.
+ */
+export function usableReasons(reasons: string[]) {
+  return reasons.filter((reason) => {
+    const text = reason.trim();
+    if (SCHEMA_KEYS.has(text.replace(/[?:.]+$/, ""))) return false;
+    return !/[\-\u2013\u2014,;]$/.test(text);
+  });
+}
 
 /** The server's decision about a bill. Never model-supplied. */
 export type ApDecision = {
@@ -382,8 +397,10 @@ export async function analyzeApBill(facts: ApFacts): Promise<ApAgentAnalysis> {
       prompt: `Explain this bill to a finance operator using only these verified facts:\n${JSON.stringify(minimizedModelContext)}`,
     });
     if (!result.output) throw new Error("Model returned no structured explanation");
+    const reasons = usableReasons(result.output.reasons);
+    if (!reasons.length) throw new Error("Model returned no usable reasons");
     // The decision is attached here, not read back from the model.
-    return { ...result.output, ...decision, source: "AI_GATEWAY", model };
+    return { ...result.output, reasons, ...decision, source: "AI_GATEWAY", model };
   } catch (error) {
     return {
       ...buildApFallback(facts),

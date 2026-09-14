@@ -12,7 +12,7 @@ test("presents the complete AP exception workflow", async () => {
   assert.match(dashboard, /Reset the demo\?/);
   assert.match(dashboard, /Retiring a bill cannot be undone/);
   for (const label of [
-    "Bills to review", "Server checks", "Bill pipeline",
+    "Bills to review", "Duplicate check", "Wallet funds", "Bill pipeline",
     "Resolve possible duplicate", "Resolve amount change", "Resolve beneficiary",
     "Validate payout with Airwallex", "View decision record", "Why the log shows a transfers call",
     "Ask about this bill", "Invoices arriving in AP", "unfiled", "Paste text instead",
@@ -62,7 +62,8 @@ test("keeps the interactive assistant inside server finance guardrails", async (
     readFile(new URL("app/api/ap/route.ts", root), "utf8"),
     readFile(new URL("lib/ap-agent.ts", root), "utf8"),
   ]);
-  assert.match(dashboard, /Anything entered here is treated as unverified/);
+  assert.match(dashboard, /message\.label\.toLowerCase\(\)\.includes\("unverified"\)/);
+  assert.match(dashboard, /\? "unverified" : ""/);
   assert.match(route, /answerApQuestion\(billCase\.facts/);
   assert.match(agent, /I cannot approve, pay, schedule, or create a transfer/);
   assert.match(agent, /You do not make or change it/i);
@@ -71,7 +72,7 @@ test("keeps the interactive assistant inside server finance guardrails", async (
   assert.doesNotMatch(agent, /serverRequiredRecommendation/);
   assert.doesNotMatch(agent, /validateApRecommendation/);
   assert.match(agent, /recommendation.*deliberately absent/s);
-  assert.match(agent, /\.\.\.result\.output, \.\.\.decision/);
+  assert.match(agent, /\.\.\.result\.output,[^}]*\.\.\.decision/);
   assert.match(dashboard, /action: "triage"/);
   assert.match(route, /previousBills/);
 });
