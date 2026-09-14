@@ -935,6 +935,19 @@ export default function APWorkbench() {
           </div>
         </header>
 
+        {confirmReset && (
+          <div className="confirmBar" role="alertdialog" aria-label="Confirm demo reset">
+            <div>
+              <strong>Reset the demo?</strong>
+              <p>Clears every saved exception decision, marks the open demo and intake bills paid in Airwallex, and lays the scenarios out again. Retiring a bill cannot be undone.</p>
+            </div>
+            <div className="confirmActions">
+              <button type="button" className="secondaryButton" onClick={() => setConfirmReset(false)}>Cancel</button>
+              <button type="button" className="dangerButton" disabled={Boolean(loading)} onClick={() => { setConfirmReset(false); post("reset_demo"); }}>Reset demo</button>
+            </div>
+          </div>
+        )}
+
         <nav className="flowRail" aria-label="Bill pipeline">
           <button type="button" className={`flowStep ${stage === "INTAKE" ? "active" : "done"}`} onClick={() => openIntake()}>
             <i>1</i>
@@ -1127,19 +1140,6 @@ export default function APWorkbench() {
               )}
           </div>
         </section>
-        )}
-
-        {confirmReset && (
-          <div className="confirmBar" role="alertdialog" aria-label="Confirm demo reset">
-            <div>
-              <strong>Reset the demo?</strong>
-              <p>Clears every saved exception decision, marks the open demo and intake bills paid in Airwallex, and lays the scenarios out again. Retiring a bill cannot be undone.</p>
-            </div>
-            <div className="confirmActions">
-              <button type="button" className="secondaryButton" onClick={() => setConfirmReset(false)}>Cancel</button>
-              <button type="button" className="dangerButton" disabled={Boolean(loading)} onClick={() => { setConfirmReset(false); post("reset_demo"); }}>Reset demo</button>
-            </div>
-          </div>
         )}
 
         {loading && <div className="inlineMessage"><span className="loader" />{loading}</div>}
