@@ -510,7 +510,7 @@ export default function APWorkbench() {
   const [resolutionNote, setResolutionNote] = useState("");
   const [selectedBeneficiaryId, setSelectedBeneficiaryId] = useState("");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [stage, setStage] = useState<"INTAKE" | "REVIEW" | "DECISION">("REVIEW");
+  const [stage, setStage] = useState<"INTAKE" | "REVIEW" | "DECISION">("INTAKE");
   const [intakeText, setIntakeText] = useState("");
   const [intakeDraft, setIntakeDraft] = useState<IntakeDraft | null>(null);
   const [confirmed, setConfirmed] = useState<ConfirmedIntake | null>(null);
