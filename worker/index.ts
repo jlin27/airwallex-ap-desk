@@ -69,6 +69,29 @@ function passwordGate(request: Request, env: Env): Response | null {
 }
 
 const worker = {
+  /**
+   * A shared demo link drifts: reviewers resolve exceptions, withdraw bills, and
+   * leave half-finished cases behind. A scheduled reset puts the scenarios back so
+   * the next person to open the link sees the demo as intended. It also warms the
+   * worker, which takes the cold start off someone's first visit.
+   *
+   * Configure the schedule at deploy time; remove the trigger entirely while you
+   * are presenting, so a reset cannot land mid-demo.
+   */
+  async scheduled(_event: unknown, env: Env, ctx: ExecutionContext): Promise<void> {
+    const request = new Request("https://ap-desk.internal/api/ap", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ action: "reset_demo" }),
+    });
+    // Calls the app handler directly, so the password gate does not apply to a
+    // request that never leaves the worker.
+    ctx.waitUntil(handler.fetch(request, env, ctx).then(
+      (response) => { console.log(`scheduled reset: ${response.status}`); },
+      (error) => { console.error("scheduled reset failed", error); },
+    ));
+  },
+
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 

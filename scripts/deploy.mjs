@@ -5,6 +5,9 @@
  *
  * Usage:
  *   CF_D1_DATABASE_ID=<uuid> [WORKER_NAME=ap-desk] node scripts/deploy.mjs [--dry-run]
+ *
+ * RESET_CRON sets the scheduled demo reset (default 06:00 UTC daily).
+ * Pass RESET_CRON=off while presenting, so a reset cannot land mid-demo.
  */
 import { readFile, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
@@ -14,6 +17,7 @@ const databaseId = process.env.CF_D1_DATABASE_ID;
 const workerName = process.env.WORKER_NAME || "ap-desk";
 const databaseName = process.env.CF_D1_DATABASE_NAME || "ap-desk-db";
 const dryRun = process.argv.includes("--dry-run");
+const resetCron = process.env.RESET_CRON ?? "0 6 * * *";
 
 if (!databaseId) {
   console.error("CF_D1_DATABASE_ID is required. Create the database first:\n" +
@@ -33,9 +37,13 @@ try {
 config.name = workerName;
 config.topLevelName = workerName;
 config.d1_databases = [{ binding: "DB", database_name: databaseName, database_id: databaseId }];
+config.triggers = resetCron === "off" ? { crons: [] } : { crons: [resetCron] };
 
 await writeFile(CONFIG, JSON.stringify(config));
 console.log(`Patched ${CONFIG}: worker "${workerName}", D1 "${databaseName}" (${databaseId.slice(0, 8)}…)`);
+console.log(resetCron === "off"
+  ? "Scheduled reset: disabled."
+  : `Scheduled reset: "${resetCron}" (set RESET_CRON=off to disable while presenting).`);
 
 if (dryRun) {
   console.log("--dry-run: stopping before deploy.");

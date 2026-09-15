@@ -502,7 +502,7 @@ export default function APWorkbench() {
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [payout, setPayout] = useState<PayoutResult | null>(null);
   const [filter, setFilter] = useState<QueueFilter>("ALL");
-  const [loading, setLoading] = useState("Connecting to Airwallex Sandbox…");
+  const [loading, setLoading] = useState("Connecting to Airwallex Sandbox and reviewing the queue — this takes about 20 seconds on first load…");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [apiActivity, setApiActivity] = useState<LoggedApiCall[]>([]);

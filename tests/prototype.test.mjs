@@ -160,6 +160,12 @@ test("gates a deployed copy behind a shared password", async () => {
   assert.match(worker, /WWW-Authenticate/);
   // Comparison must not short-circuit on the first differing byte.
   assert.match(worker, /function secretsMatch/);
+  // The scheduled reset calls the app handler directly, so the gate must not sit
+  // in front of a request that never leaves the worker.
+  assert.match(worker, /async scheduled\(/);
+  const scheduled = worker.slice(worker.indexOf("async scheduled("), worker.indexOf("async fetch("));
+  assert.match(scheduled, /reset_demo/);
+  assert.doesNotMatch(scheduled, /passwordGate/);
   assert.doesNotMatch(worker, /supplied === expected/);
 });
 
