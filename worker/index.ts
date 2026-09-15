@@ -5,6 +5,8 @@ import handler from "vinext/server/app-router-entry";
 interface Env {
   ASSETS: Fetcher;
   DB: D1Database;
+  /** When set, every request must present it via HTTP Basic auth. */
+  DEMO_PASSWORD?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -25,9 +27,53 @@ interface ExecutionContext {
 // dangerouslyAllowSVG: true in next.config.js and uncomment below:
 // const imageConfig: ImageConfig = { dangerouslyAllowSVG: true };
 
+/** Length-independent comparison, so a wrong guess leaks nothing through timing. */
+function secretsMatch(a: string, b: string) {
+  const left = new TextEncoder().encode(a);
+  const right = new TextEncoder().encode(b);
+  let diff = left.length ^ right.length;
+  for (let i = 0; i < Math.max(left.length, right.length); i += 1) {
+    diff |= (left[i] ?? 0) ^ (right[i] ?? 0);
+  }
+  return diff === 0;
+}
+
+/**
+ * The app has no user accounts, and a deployed copy drives a real Airwallex
+ * sandbox and a metered model. This keeps a shared link from being an open
+ * door. It is a demo gate, not an authentication system: everyone who gets in
+ * is still the same unauthenticated operator in the audit trail.
+ */
+function passwordGate(request: Request, env: Env): Response | null {
+  const expected = env.DEMO_PASSWORD;
+  if (!expected) return null;
+
+  const header = request.headers.get("Authorization") || "";
+  if (header.startsWith("Basic ")) {
+    try {
+      const decoded = atob(header.slice(6));
+      const supplied = decoded.slice(decoded.indexOf(":") + 1);
+      if (secretsMatch(supplied, expected)) return null;
+    } catch {
+      // Malformed header: fall through and challenge again.
+    }
+  }
+
+  return new Response("Authentication required", {
+    status: 401,
+    headers: {
+      "WWW-Authenticate": 'Basic realm="AP Desk demo", charset="UTF-8"',
+      "Cache-Control": "no-store",
+    },
+  });
+}
+
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+
+    const challenge = passwordGate(request, env);
+    if (challenge) return challenge;
 
     if (url.pathname === "/_vinext/image") {
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];

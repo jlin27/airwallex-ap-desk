@@ -148,6 +148,21 @@ test("bill detail is only fetched for bills the queue shows", async () => {
   assert.match(route, /if \(!OPEN_STATUSES\.has\(String\(bill\.status \|\| ""\)\)\) return bill;/);
 });
 
+test("gates a deployed copy behind a shared password", async () => {
+  const worker = await readFile(new URL("worker/index.ts", root), "utf8");
+  // A deployed copy drives a real sandbox and a metered model, so the gate has to
+  // run before anything else the worker does.
+  const fetchBody = worker.slice(worker.indexOf("async fetch("));
+  const gateAt = fetchBody.indexOf("passwordGate(request, env)");
+  const handlerAt = fetchBody.indexOf("handler.fetch");
+  assert.ok(gateAt > -1, "the worker must call passwordGate");
+  assert.ok(gateAt < handlerAt, "passwordGate must run before the app handler");
+  assert.match(worker, /WWW-Authenticate/);
+  // Comparison must not short-circuit on the first differing byte.
+  assert.match(worker, /function secretsMatch/);
+  assert.doesNotMatch(worker, /supplied === expected/);
+});
+
 test("never creates a transfer", async () => {
   const files = await Promise.all([
     readFile(new URL("app/api/ap/route.ts", root), "utf8"),
